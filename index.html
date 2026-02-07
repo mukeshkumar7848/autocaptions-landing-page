@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto Captions Pro — Professional Captions for After Effects</title>
+  <meta name="description" content="Create stunning animated captions directly in After Effects. Fast, accurate, fully offline.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- AOS Animation Library -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="mainNav">
+    <div class="nav-content">
+      <a href="#hero" class="nav-logo">
+        <img src=".client/assets/logo.png" alt="Auto Captions Pro" class="logo-img">
+        <span class="logo-text">Auto Captions Pro</span>
+      </a>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="nav-btn" target="_blank" rel="noopener">Buy Now</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
+        <h1 class="hero-title">
+          Auto Captions for<br>
+          <span class="gradient-text">After Effects</span>
+        </h1>
+        <p class="hero-subtitle">
+          Create stunning animated captions with AI-powered speech recognition.<br>
+          Fast, accurate, and completely offline.
+        </p>
+        <div class="hero-actions">
+          <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="btn btn-primary btn-large" target="_blank" rel="noopener">
+            Get Pro Version
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="https://mukeshfx.gumroad.com/l/autocaptions" class="btn btn-secondary btn-large" target="_blank" rel="noopener">
+            Try Free Version
+          </a>
+        </div>
+        <p class="hero-note">Start with our free version • Upgrade anytime</p>
+        <div class="hero-trust">
+          <div class="trust-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>After Effects 2022+</span>
+          </div>
+          <div class="trust-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <span>100% Offline</span>
+          </div>
+          <div class="trust-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>One-Time Purchase</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hero-visual" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
+        <div class="device-frame">
+          <div class="device-header">
+            <div class="device-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="device-title">Auto Captions Pro</span>
+          </div>
+          <div class="device-content">
+            <div class="panel-section">
+              <div class="panel-label">Caption Settings</div>
+              <div class="panel-row">
+                <span>Count By</span>
+                <span class="panel-value">Characters</span>
+              </div>
+              <div class="panel-row">
+                <span>Max Characters</span>
+                <span class="panel-value">32</span>
+              </div>
+              <div class="panel-row">
+                <span>Line Mode</span>
+                <span class="panel-value">Smart</span>
+              </div>
+            </div>
+            <div class="panel-section">
+              <div class="panel-label">AI Settings</div>
+              <div class="panel-row">
+                <span>Language</span>
+                <span class="panel-value">Auto-detect</span>
+              </div>
+              <div class="panel-row">
+                <span>Model</span>
+                <span class="panel-value">Small ⚡</span>
+              </div>
+            </div>
+            <div class="panel-section">
+              <div class="panel-label">Animations</div>
+              <div class="anim-grid">
+                <div class="anim-tile active">Fade</div>
+                <div class="anim-tile">Bounce</div>
+                <div class="anim-tile">Slide</div>
+                <div class="anim-tile">Blur</div>
+                <div class="anim-tile">Character</div>
+                <div class="anim-tile">Blink</div>
+              </div>
+            </div>
+            <button class="panel-generate">Generate Captions</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Video Demo Section -->
+  <section class="section video-demo">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">See It In Action</span>
+        <h2 class="section-title">Watch How It Works</h2>
+        <p class="section-desc">Learn how to install and use Auto Captions Pro in just a few minutes.</p>
+      </div>
+      <div class="video-wrapper" data-aos="fade-up" data-aos-delay="100">
+        <div class="video-container">
+          <iframe width="1297" height="730" src="https://www.youtube.com/embed/ivpT9CqleS4" title="How to Install the AE Captions Generator Pro Extension in After Effects for Free" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+  <section class="section reviews">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">Testimonials</span>
+        <h2 class="section-title">Loved by creators worldwide</h2>
+        <p class="section-desc">Join thousands of satisfied users creating amazing captions every day.</p>
+      </div>
+      
+      <div class="reviews-grid">
+        <div class="review-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="review-stars">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="review-text">"This extension has completely transformed my workflow! Creating captions used to take hours, now it's done in minutes. The accuracy is incredible and the animations look so professional."</p>
+          <div class="review-author">
+            <div class="author-avatar">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="author-name">Sarah Martinez</div>
+              <div class="author-role">Content Creator</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="review-stars">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="review-text">"Best investment for my video editing workflow! The fact that it works completely offline is a game-changer. No more worrying about privacy or internet connection. Highly recommended!"</p>
+          <div class="review-author">
+            <div class="author-avatar">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="author-name">James Chen</div>
+              <div class="author-role">Video Editor</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="review-stars">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="review-text">"I tried the free version first and was blown away. Immediately upgraded to Pro for all the animation styles. Worth every penny! My clients love the professional look of my videos now."</p>
+          <div class="review-author">
+            <div class="author-avatar">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="author-name">Emily Rodriguez</div>
+              <div class="author-role">Social Media Manager</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section features" id="features">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">Capabilities</span>
+        <h2 class="section-title">Powerful features.<br>Simple to use.</h2>
+        <p class="section-desc">Everything you need to create professional captions, built right into After Effects.</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="feature-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <h3>Offline AI Processing</h3>
+          <p>Powered by local speech-to-text AI. Your content stays private. No internet required.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
+          <h3>6 Animation Presets</h3>
+          <p>Fade, Bounce, Blur, Slide, Character, and Blink with full directional control.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <h3>Real-Time Preview</h3>
+          <p>See your captions come to life instantly. Edit timing and text with native AE tools.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="feature-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          </div>
+          <h3>20+ Languages</h3>
+          <p>Auto-detect or manually select from English, Spanish, French, Japanese, and more.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="feature-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <h3>Batch Mode</h3>
+          <p>Process multiple video layers at once. Save hours on large projects.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <h3>SRT Export</h3>
+          <p>Export standard SRT subtitle files. Compatible with every video platform.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <h3>Smart Line Breaking</h3>
+          <p>Intelligent text splitting by characters or words. Multiple line modes available.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="feature-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <h3>Background Boxes</h3>
+          <p>Add customizable background boxes with color, opacity, and roundness controls.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">Process</span>
+        <h2 class="section-title">From audio to captions<br>in four simple steps.</h2>
+      </div>
+      
+      <div class="steps-container">
+        <div class="step" data-aos="fade-right" data-aos-delay="0">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h3>Import Your Video</h3>
+            <p>Drop your video into After Effects and create a composition. Select your video layer.</p>
+          </div>
+        </div>
+        
+        <div class="step" data-aos="fade-right" data-aos-delay="100">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h3>Configure Settings</h3>
+            <p>Choose your language, model size, and caption preferences. Everything runs locally.</p>
+          </div>
+        </div>
+        
+        <div class="step" data-aos="fade-right" data-aos-delay="200">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3>Generate Captions</h3>
+            <p>Click generate and watch AI transcribe your audio into perfectly timed captions.</p>
+          </div>
+        </div>
+        
+        <div class="step" data-aos="fade-right" data-aos-delay="300">
+          <div class="step-number">04</div>
+          <div class="step-content">
+            <h3>Style & Export</h3>
+            <p>Add animations, adjust timing, and export. Captions are native AE text layers.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section pricing" id="pricing">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">Pricing</span>
+        <h2 class="section-title">Simple pricing.<br>No subscriptions.</h2>
+        <p class="section-desc">Pay once. Own it forever. All features included.</p>
+      </div>
+      
+      <div class="pricing-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="pricing-badge">Best Value</div>
+        <div class="pricing-header">
+          <h3>Auto Captions Pro</h3>
+          <div class="pricing-price">
+            <span class="currency">$</span>
+            <span class="amount">49</span>
+          </div>
+          <p class="pricing-period">One-time payment</p>
+        </div>
+        
+        <ul class="pricing-features">
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Lifetime license
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Free lifetime updates
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            macOS & Windows support
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            100% offline processing
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            6 animation presets
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            20+ languages
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Batch processing
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            SRT export
+          </li>
+        </ul>
+        
+        <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="btn btn-primary btn-large" target="_blank" rel="noopener">
+          Buy Now
+        </a>
+        
+        <p class="pricing-note">Instant download • No subscription • Works offline</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section faq" id="faq">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">FAQ</span>
+        <h2 class="section-title">Questions?<br>We've got answers.</h2>
+      </div>
+      
+      <div class="faq-list">
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="0">
+          <button class="faq-question">
+            <span>Is it completely offline?</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! Auto Captions runs 100% on your local machine. No audio is ever sent to the cloud. Your content stays private and processing works without an internet connection.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+          <button class="faq-question">
+            <span>Which After Effects versions are supported?</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Auto Captions Pro works with After Effects 2022 (version 22.0) and later on both macOS and Windows.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
+          <button class="faq-question">
+            <span>Can I edit the captions after generating?</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Absolutely! Captions are created as native After Effects text layers. You can edit text, timing, styling, and animations like any other layer in your composition.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
+          <button class="faq-question">
+            <span>Is this a subscription?</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>No! It's a one-time purchase with lifetime access and free updates. No recurring fees, no login required, no hidden costs.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="400">
+          <button class="faq-question">
+            <span>What languages are supported?</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>20+ languages including English, Hinglish, Spanish, French, German, Portuguese, Italian, Japanese, Korean, Chinese, Russian, Dutch, Turkish, Polish, Ukrainian, Arabic, Hindi, Thai, Vietnamese, and Indonesian with auto-detect.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="500">
+          <button class="faq-question">
+            <span>How accurate is the transcription?</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>We offer two models: Small (fast) and Medium (accurate). The Medium model provides professional-grade accuracy comparable to cloud services, but runs entirely on your machine.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="../client/assets/logo.png" alt="Auto Captions Pro" class="footer-logo">
+          <p>Professional captions for After Effects.<br>Fast, accurate, completely offline.</p>
+        </div>
+        
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>Product</h4>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" target="_blank">Download</a>
+          </div>
+          
+          <div class="footer-col">
+            <h4>Support</h4>
+            <a href="#faq">FAQ</a>
+            <a href="mailto:support@autocaptions.pro">Email Support</a>
+            <a href="mailto:bugs@autocaptions.pro">Report Bug</a>
+          </div>
+          
+          <div class="footer-col">
+            <h4>Social</h4>
+            <a href="https://www.youtube.com/channel/UCy7KFDmtn2ziZLxH3L_ImYQ" target="_blank">YouTube</a>
+            <a href="https://www.instagram.com/mukesh.fx_/" target="_blank">Instagram</a>
+            <a href="https://x.com/mukesh_fx" target="_blank">Twitter</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; <span id="year"></span> Auto Captions Pro. All rights reserved.</p>
+        <p>Made with ❤️ by <strong>Mukeshfx</strong></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
