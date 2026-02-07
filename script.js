@@ -7,11 +7,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize AOS Library
   AOS.init({
-    duration: 800,
-    offset: 100,
     once: true,
-    easing: 'ease-out-cubic',
-    delay: 50
+    offset: 80,
+    duration: 600,
+    easing: 'ease-out-cubic'
   });
 
   // Initialize all components
@@ -225,5 +224,86 @@ function trackEvent(category, action, label) {
 document.querySelectorAll('.btn-primary').forEach(btn => {
   btn.addEventListener('click', () => {
     trackEvent('CTA', 'Click', btn.textContent);
+  });
+});
+
+// Initialize AOS
+AOS.init({
+  once: true,
+  offset: 80,
+  duration: 600,
+  easing: 'ease-out-cubic'
+});
+
+// Set current year
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// Navigation scroll effect
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 20) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+});
+
+// Mobile menu toggle
+const navToggle = document.getElementById('navToggle');
+const navMenu = document.getElementById('navMenu');
+
+navToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  navToggle.classList.toggle('active');
+});
+
+// Close mobile menu on link click
+navMenu.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    navMenu.classList.remove('active');
+    navToggle.classList.remove('active');
+  });
+});
+
+// FAQ Accordion
+document.querySelectorAll('.faq-question').forEach(button => {
+  button.addEventListener('click', () => {
+    const item = button.parentElement;
+    const isActive = item.classList.contains('active');
+
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(i => {
+      i.classList.remove('active');
+    });
+
+    // Open clicked if it wasn't active
+    if (!isActive) {
+      item.classList.add('active');
+    }
+  });
+});
+
+// Back to top button
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 500) {
+    backToTop.classList.add('visible');
+  } else {
+    backToTop.classList.remove('visible');
+  }
+});
+
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
   });
 });
