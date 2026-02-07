@@ -697,7 +697,7 @@ img {
 .comparison-plan-name {
   font-weight: 700;
   font-size: 16px;
-  color: var(--text-primary);
+  color: var(--primary);
 }
 
 .comparison-plan-price {
@@ -1154,6 +1154,7 @@ img {
 }
 
 .faq-answer {
+  display: block;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1164,10 +1165,6 @@ img {
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.7;
-}
-
-.faq-item.active .faq-answer {
-  max-height: 300px;
 }
 
 /* ========================================
@@ -1353,12 +1350,30 @@ img {
     border-bottom: 1px solid var(--border);
     flex-direction: column;
     padding: 16px 24px;
-    gap: 12px;
+    gap: 4px;
     box-shadow: var(--shadow-md);
+    z-index: 999;
   }
 
   .nav-menu.active {
     display: flex;
+  }
+
+  .nav-menu li {
+    list-style: none;
+  }
+
+  .nav-menu a {
+    display: block;
+    padding: 12px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .nav-menu li:last-child a {
+    border-bottom: none;
   }
 
   .nav-actions {

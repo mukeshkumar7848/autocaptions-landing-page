@@ -3,15 +3,25 @@
 // Apple-inspired smooth animations & UX
 // ================================================
 
-// Initialize AOS (Animate On Scroll)
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize AOS Library
+let aosReady = false;
+function initAOSOnce() {
+  if (!window.AOS || aosReady) return;
+  aosReady = true;
   AOS.init({
     once: true,
     offset: 80,
     duration: 600,
     easing: 'ease-out-cubic'
   });
+  window.addEventListener('load', () => {
+    if (window.AOS) AOS.refreshHard();
+  });
+}
+
+// Initialize AOS (Animate On Scroll)
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize AOS Library
+  initAOSOnce();
 
   // Initialize all components
   initNavigation();
@@ -56,22 +66,31 @@ function initNavigation() {
 // FAQ ACCORDION
 // ================================================
 function initFAQ() {
+  if (window.__acpFaqBound) return;
+  window.__acpFaqBound = true;
   const faqItems = document.querySelectorAll('.faq-item');
   
   faqItems.forEach(item => {
     const question = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    if (answer) answer.style.maxHeight = '0px';
     
     question.addEventListener('click', () => {
-      // Close other items
       const isActive = item.classList.contains('active');
       
+      // Close all items
       faqItems.forEach(otherItem => {
         otherItem.classList.remove('active');
+        const otherAnswer = otherItem.querySelector('.faq-answer');
+        if (otherAnswer) otherAnswer.style.maxHeight = '0px';
       });
       
       // Toggle current item
-      if (!isActive) {
+      if (!isActive && answer) {
         item.classList.add('active');
+        requestAnimationFrame(() => {
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        });
       }
     });
   });
@@ -227,83 +246,117 @@ document.querySelectorAll('.btn-primary').forEach(btn => {
   });
 });
 
-// Initialize AOS
-AOS.init({
-  once: true,
-  offset: 80,
-  duration: 600,
-  easing: 'ease-out-cubic'
-});
+// Guard duplicate global bindings so they don’t run twice
+if (!window.__acpLandingBindings) {
+  window.__acpLandingBindings = true;
 
-// Set current year
-document.getElementById('year').textContent = new Date().getFullYear();
+  // Initialize AOS
+  initAOSOnce();
 
-// Navigation scroll effect
-const nav = document.getElementById('mainNav');
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 20) {
-    nav.classList.add('scrolled');
-  } else {
-    nav.classList.remove('scrolled');
-  }
-});
+  // Set current year
+  const yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// Mobile menu toggle
-const navToggle = document.getElementById('navToggle');
-const navMenu = document.getElementById('navMenu');
-
-navToggle.addEventListener('click', () => {
-  navMenu.classList.toggle('active');
-  navToggle.classList.toggle('active');
-});
-
-// Close mobile menu on link click
-navMenu.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    navMenu.classList.remove('active');
-    navToggle.classList.remove('active');
+  // Navigation scroll effect
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
   });
-});
 
-// FAQ Accordion
-document.querySelectorAll('.faq-question').forEach(button => {
-  button.addEventListener('click', () => {
-    const item = button.parentElement;
-    const isActive = item.classList.contains('active');
+  // Mobile menu toggle
+  const navToggle = document.getElementById('navToggle');
+  const navMenu = document.getElementById('navMenu');
 
-    // Close all
-    document.querySelectorAll('.faq-item').forEach(i => {
-      i.classList.remove('active');
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = navMenu.classList.contains('active');
+      if (isOpen) {
+        navMenu.classList.remove('active');
+        navToggle.classList.remove('active');
+      } else {
+        navMenu.classList.add('active');
+        navToggle.classList.add('active');
+      }
     });
 
-    // Open clicked if it wasn't active
-    if (!isActive) {
-      item.classList.add('active');
-    }
-  });
-});
+    // Close mobile menu on link click
+    navMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+        navToggle.classList.remove('active');
+      });
+    });
 
-// Back to top button
-const backToTop = document.getElementById('backToTop');
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 500) {
-    backToTop.classList.add('visible');
-  } else {
-    backToTop.classList.remove('visible');
+    // Close mobile menu on outside click
+    document.addEventListener('click', (e) => {
+      if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
+        navMenu.classList.remove('active');
+        navToggle.classList.remove('active');
+      }
+    });
   }
-});
 
-backToTop.addEventListener('click', () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+  // FAQ Accordion
+  if (!window.__acpFaqBound) {
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const item = button.closest('.faq-item');
+        if (!item) return;
 
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
+        const answer = item.querySelector('.faq-answer');
+        if (!answer) return;
+
+        const isActive = item.classList.contains('active');
+
+        // Close all FAQ items first
+        document.querySelectorAll('.faq-item').forEach(i => {
+          i.classList.remove('active');
+          const a = i.querySelector('.faq-answer');
+          if (a) a.style.maxHeight = '0px';
+        });
+
+        // If it wasn't active, open it
+        if (!isActive) {
+          item.classList.add('active');
+          requestAnimationFrame(() => {
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+          });
+        }
+      });
+    });
+  }
+
+  // Back to top button
+  const backToTop = document.getElementById('backToTop');
+  if (backToTop) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+    });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (href === '#') return;
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
   });
-});
+}
