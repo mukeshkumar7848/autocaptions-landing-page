@@ -1,0 +1,22 @@
+# Netlify Redirects for Auto Captions Pro
+
+# Custom 404 page
+/*    /404.html    404
+
+# Redirect old pages to getpro
+/pricing              /getpro.html          301
+/buy                  /getpro.html          301
+/purchase             /getpro.html          301
+/upgrade              /getpro.html          301
+
+# Redirect with query parameters preserved
+/pricing/*            /getpro.html          301
+/buy/*                /getpro.html          301
+
+# Force HTTPS (optional, Netlify does this by default)
+# http://*             https://:splat         301!
+
+# Clean URLs (optional - remove .html extension)
+# /getpro              /getpro.html          200
+# /privacy             /privacy.html         200
+# /terms               /terms.html           200

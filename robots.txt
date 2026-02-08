@@ -1,0 +1,10 @@
+# robots.txt for Auto Captions Pro
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://autocaptionspro.com/sitemap.xml
+
+# Disallow nothing - all pages are public and should be indexed
+# Including the getpro page for SEO benefits

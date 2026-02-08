@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Pro - Auto Captions Pro | Upgrade Your Caption Game</title>
+  <meta name="description" content="Upgrade to Auto Captions Pro and unlock unlimited captions, advanced animations, and premium features. 7500+ creators trust us.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    /* Additional styles specific to Get Pro page */
+    .getpro-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 120px 20px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .getpro-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+      background-size: cover;
+      opacity: 0.3;
+    }
+
+    .getpro-content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .getpro-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .getpro-hero h1 {
+      font-size: 56px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .getpro-hero .subtitle {
+      font-size: 20px;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+
+    .price-highlight {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 30px;
+      border-radius: 16px;
+      margin: 40px auto;
+      max-width: 500px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .price-highlight .old-price {
+      text-decoration: line-through;
+      opacity: 0.7;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .price-highlight .new-price {
+      font-size: 48px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .price-highlight .discount-badge {
+      display: inline-block;
+      background: #00D2FF;
+      color: #0A0A1A;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .btn-large {
+      padding: 20px 40px;
+      font-size: 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .btn-primary-large {
+      background: white;
+      color: #667eea;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary-large:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-secondary-large {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary-large:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-3px);
+    }
+
+    .features-comparison {
+      padding: 80px 20px;
+      background: var(--bg);
+    }
+
+    .comparison-grid {
+      max-width: 1000px;
+      margin: 60px auto 0;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-row:last-child {
+      border-bottom: none;
+    }
+
+    .comparison-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 700;
+    }
+
+    .comparison-cell {
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .comparison-cell:first-child {
+      text-align: left;
+      justify-content: flex-start;
+    }
+
+    .comparison-header .comparison-cell {
+      font-size: 18px;
+    }
+
+    .check-icon {
+      color: #00D88A;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .cross-icon {
+      color: #FF6B6B;
+      font-size: 20px;
+    }
+
+    .testimonials-section {
+      padding: 80px 20px;
+      background: var(--bg-section);
+    }
+
+    .trust-badges {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .trust-badge {
+      text-align: center;
+    }
+
+    .trust-badge-number {
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .trust-badge-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .guarantee-section {
+      background: linear-gradient(135deg, #00D88A 0%, #00B372 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+      margin: 80px 0;
+    }
+
+    .guarantee-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .guarantee-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .faq-section {
+      padding: 80px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .getpro-hero h1 {
+        font-size: 36px;
+      }
+
+      .getpro-hero .subtitle {
+        font-size: 18px;
+      }
+
+      .price-highlight .new-price {
+        font-size: 36px;
+      }
+
+      .comparison-row {
+        grid-template-columns: 1.5fr 1fr 1fr;
+        font-size: 14px;
+      }
+
+      .comparison-cell {
+        padding: 12px 8px;
+      }
+
+      .btn-large {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .cta-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="mainNav">
+    <div class="nav-content">
+      <a href="index.html" class="nav-logo">
+        <img src="../client/assets/logo.png" alt="Auto Captions Pro" class="logo-img">
+        <span class="logo-text">Auto Captions Pro</span>
+      </a>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="index.html#how-it-works">How It Works</a></li>
+        <li><a href="index.html#pricing">Pricing</a></li>
+        <li><a href="index.html#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="https://mukeshfx.gumroad.com/l/autocaptions" class="nav-btn-secondary" target="_blank" rel="noopener">Try Free</a>
+        <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="nav-btn" target="_blank" rel="noopener">Get Pro</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="getpro-hero">
+    <div class="getpro-content">
+      <div class="getpro-badge">⚡ LIMITED TIME OFFER</div>
+      <h1>Upgrade to Pro &<br>Transform Your Workflow</h1>
+      <p class="subtitle">Join 7,500+ creators who save hours every week with AI-powered captions. Get unlimited exports, premium animations, and lifetime updates.</p>
+      
+      <div class="price-highlight">
+        <div class="old-price">$49.99</div>
+        <div class="new-price">$29.99</div>
+        <div style="font-size: 16px; opacity: 0.9; margin-bottom: 12px;">One-time payment • Lifetime access</div>
+        <div class="discount-badge">Save 40% Today!</div>
+      </div>
+
+      <div class="cta-buttons">
+        <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="btn-large btn-primary-large" target="_blank" rel="noopener">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          Get Pro Now
+        </a>
+        <a href="https://mukeshfx.gumroad.com/l/autocaptions" class="btn-large btn-secondary-large" target="_blank" rel="noopener">
+          Try Free Version
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Badges -->
+  <section style="padding: 60px 20px; background: white;">
+    <div class="trust-badges">
+      <div class="trust-badge">
+        <div class="trust-badge-number">7,500+</div>
+        <div class="trust-badge-text">Happy Creators</div>
+      </div>
+      <div class="trust-badge">
+        <div class="trust-badge-number">4.9/5</div>
+        <div class="trust-badge-text">Average Rating</div>
+      </div>
+      <div class="trust-badge">
+        <div class="trust-badge-number">100%</div>
+        <div class="trust-badge-text">Offline Processing</div>
+      </div>
+      <div class="trust-badge">
+        <div class="trust-badge-number">∞</div>
+        <div class="trust-badge-text">Unlimited Exports</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Comparison -->
+  <section class="features-comparison">
+    <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+      <h2 style="font-size: 42px; font-weight: 800; margin-bottom: 16px;">Free vs Pro</h2>
+      <p style="font-size: 18px; color: var(--text-secondary);">See what you get when you upgrade to the Pro version</p>
+    </div>
+
+    <div class="comparison-grid">
+      <div class="comparison-row comparison-header">
+        <div class="comparison-cell">Feature</div>
+        <div class="comparison-cell">Free</div>
+        <div class="comparison-cell">Pro</div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>AI Speech Recognition</strong></div>
+        <div class="comparison-cell"><span class="check-icon">✓</span></div>
+        <div class="comparison-cell"><span class="check-icon">✓</span></div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>Export Captions</strong></div>
+        <div class="comparison-cell">5 per month</div>
+        <div class="comparison-cell"><strong>Unlimited</strong></div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>Animation Presets</strong></div>
+        <div class="comparison-cell">3 Basic</div>
+        <div class="comparison-cell"><strong>50+ Premium</strong></div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>Custom Styling</strong></div>
+        <div class="comparison-cell"><span class="cross-icon">✗</span></div>
+        <div class="comparison-cell"><span class="check-icon">✓</span></div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>Word-by-Word Highlighting</strong></div>
+        <div class="comparison-cell"><span class="cross-icon">✗</span></div>
+        <div class="comparison-cell"><span class="check-icon">✓</span></div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>Multi-Language Support</strong></div>
+        <div class="comparison-cell">English Only</div>
+        <div class="comparison-cell"><strong>100+ Languages</strong></div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>Priority Support</strong></div>
+        <div class="comparison-cell"><span class="cross-icon">✗</span></div>
+        <div class="comparison-cell"><span class="check-icon">✓</span></div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>Lifetime Updates</strong></div>
+        <div class="comparison-cell"><span class="cross-icon">✗</span></div>
+        <div class="comparison-cell"><span class="check-icon">✓</span></div>
+      </div>
+
+      <div class="comparison-row">
+        <div class="comparison-cell"><strong>Commercial License</strong></div>
+        <div class="comparison-cell"><span class="cross-icon">✗</span></div>
+        <div class="comparison-cell"><span class="check-icon">✓</span></div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="btn-large btn-primary-large" target="_blank" rel="noopener">
+        Upgrade to Pro Now
+      </a>
+    </div>
+  </section>
+
+  <!-- Guarantee Section -->
+  <section class="guarantee-section">
+    <div class="guarantee-content">
+      <div class="guarantee-icon">🛡️</div>
+      <h2 style="font-size: 36px; font-weight: 800; margin-bottom: 16px;">30-Day Money-Back Guarantee</h2>
+      <p style="font-size: 18px; line-height: 1.6;">Try Auto Captions Pro risk-free. If you're not completely satisfied within 30 days, we'll give you a full refund—no questions asked.</p>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials-section">
+    <div style="text-align: center; max-width: 800px; margin: 0 auto 60px;">
+      <h2 style="font-size: 42px; font-weight: 800; margin-bottom: 16px;">Loved by Creators</h2>
+      <p style="font-size: 18px; color: var(--text-secondary);">See what professionals are saying about Auto Captions Pro</p>
+    </div>
+
+    <div class="testimonials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+      <div class="testimonial-card" style="background: white; padding: 30px; border-radius: 16px; box-shadow: var(--shadow-md);">
+        <div style="color: #FFD700; font-size: 24px; margin-bottom: 16px;">★★★★★</div>
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: var(--text-primary);">"This extension has saved me countless hours. The AI is incredibly accurate and the animations are top-notch!"</p>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+          <div>
+            <div style="font-weight: 700;">Sarah Johnson</div>
+            <div style="font-size: 14px; color: var(--text-secondary);">Video Editor</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card" style="background: white; padding: 30px; border-radius: 16px; box-shadow: var(--shadow-md);">
+        <div style="color: #FFD700; font-size: 24px; margin-bottom: 16px;">★★★★★</div>
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: var(--text-primary);">"Best investment I've made for my After Effects workflow. The Pro version is absolutely worth it!"</p>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #00D88A, #00B372);"></div>
+          <div>
+            <div style="font-weight: 700;">Mike Chen</div>
+            <div style="font-size: 14px; color: var(--text-secondary);">Content Creator</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card" style="background: white; padding: 30px; border-radius: 16px; box-shadow: var(--shadow-md);">
+        <div style="color: #FFD700; font-size: 24px; margin-bottom: 16px;">★★★★★</div>
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: var(--text-primary);">"The accuracy is amazing and it works completely offline. Perfect for my client work!"</p>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #FF6B6B, #FF5252);"></div>
+          <div>
+            <div style="font-weight: 700;">Emily Rodriguez</div>
+            <div style="font-size: 14px; color: var(--text-secondary);">Freelance Designer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div style="text-align: center; margin-bottom: 60px;">
+      <h2 style="font-size: 42px; font-weight: 800; margin-bottom: 16px;">Frequently Asked Questions</h2>
+    </div>
+
+    <div class="faq-list" style="display: flex; flex-direction: column; gap: 20px;">
+      <details style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); cursor: pointer;">
+        <summary style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Is this a one-time payment or subscription?</summary>
+        <p style="margin-top: 16px; color: var(--text-secondary); line-height: 1.6;">It's a one-time payment! You get lifetime access to Auto Captions Pro with all future updates included.</p>
+      </details>
+
+      <details style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); cursor: pointer;">
+        <summary style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Can I use this for commercial projects?</summary>
+        <p style="margin-top: 16px; color: var(--text-secondary); line-height: 1.6;">Yes! The Pro version includes a commercial license, so you can use it for client work and commercial projects.</p>
+      </details>
+
+      <details style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); cursor: pointer;">
+        <summary style="font-size: 18px; font-weight: 700; color: var(--text-primary);">What if I'm not satisfied?</summary>
+        <p style="margin-top: 16px; color: var(--text-secondary); line-height: 1.6;">We offer a 30-day money-back guarantee. If you're not happy with your purchase, just contact us for a full refund.</p>
+      </details>
+
+      <details style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); cursor: pointer;">
+        <summary style="font-size: 18px; font-weight: 700; color: var(--text-primary);">How do I upgrade from the free version?</summary>
+        <p style="margin-top: 16px; color: var(--text-secondary); line-height: 1.6;">Simply purchase the Pro version and replace the free extension with the Pro version. All your settings will be preserved.</p>
+      </details>
+
+      <details style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); cursor: pointer;">
+        <summary style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Does it work offline?</summary>
+        <p style="margin-top: 16px; color: var(--text-secondary); line-height: 1.6;">Yes! Auto Captions Pro works completely offline. No internet connection required, keeping your projects private and secure.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 80px 20px; text-align: center; color: white;">
+    <div style="max-width: 700px; margin: 0 auto;">
+      <h2 style="font-size: 42px; font-weight: 800; margin-bottom: 20px;">Ready to Transform Your Workflow?</h2>
+      <p style="font-size: 20px; margin-bottom: 40px; opacity: 0.95;">Join thousands of creators who trust Auto Captions Pro for their projects</p>
+      <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="btn-large btn-primary-large" target="_blank" rel="noopener" style="display: inline-flex;">
+        Get Pro for $29.99 →
+      </a>
+      <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">30-day money-back guarantee • Instant delivery</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background: var(--bg-dark); color: white; padding: 60px 20px 30px; text-align: center;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 30px;">
+        <img src="../client/assets/logo.png" alt="Auto Captions Pro" style="width: 40px; height: 40px;" onerror="this.style.display='none'">
+        <span style="font-size: 20px; font-weight: 700;">Auto Captions Pro</span>
+      </div>
+      <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; font-size: 14px;">
+        <a href="index.html" style="color: rgba(255,255,255,0.8); text-decoration: none;">Home</a>
+        <a href="index.html#features" style="color: rgba(255,255,255,0.8); text-decoration: none;">Features</a>
+        <a href="index.html#pricing" style="color: rgba(255,255,255,0.8); text-decoration: none;">Pricing</a>
+        <a href="privacy.html" style="color: rgba(255,255,255,0.8); text-decoration: none;">Privacy</a>
+        <a href="terms.html" style="color: rgba(255,255,255,0.8); text-decoration: none;">Terms</a>
+      </div>
+      <p style="font-size: 14px; opacity: 0.6;">© 2026 Auto Captions Pro. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
