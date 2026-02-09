@@ -333,16 +333,17 @@
       </div>
 
       <div class="cta-buttons">
-        <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="btn-large btn-primary-large" target="_blank" rel="noopener">
+        <button id="getProBtn" class="btn-large btn-primary-large">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
           Get Pro Now
-        </a>
+        </button>
         <a href="https://mukeshfx.gumroad.com/l/autocaptions" class="btn-large btn-secondary-large" target="_blank" rel="noopener">
           Try Free Version
         </a>
       </div>
+      <div id="paymentRegionInfo" style="text-align: center; margin-top: 20px; font-size: 14px; opacity: 0.8;"></div>
     </div>
   </section>
 
@@ -456,9 +457,9 @@
     </div>
 
     <div style="text-align: center; margin-top: 40px;">
-      <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="btn-large btn-primary-large" target="_blank" rel="noopener">
+      <button id="upgradeProBtn" class="btn-large btn-primary-large">
         Upgrade to Pro Now
-      </a>
+      </button>
     </div>
   </section>
 
@@ -556,9 +557,9 @@
     <div style="max-width: 700px; margin: 0 auto;">
       <h2 style="font-size: 42px; font-weight: 800; margin-bottom: 20px;">Ready to Unlock Unlimited Power?</h2>
       <p style="font-size: 20px; margin-bottom: 40px; opacity: 0.95;">Join thousands of creators who trust Auto Captions Pro for their projects</p>
-      <a href="https://mukeshfx.gumroad.com/l/Autocaptionspro" class="btn-large btn-primary-large" target="_blank" rel="noopener" style="display: inline-flex;">
+      <button id="finalCtaBtn" class="btn-large btn-primary-large" style="display: inline-flex;">
         Get Pro for $49 →
-      </a>
+      </button>
       <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">One-time payment • Lifetime access • Instant delivery</p>
     </div>
   </section>
@@ -581,6 +582,10 @@
     </div>
   </footer>
 
+  <!-- Razorpay Checkout Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  
   <script src="script.js"></script>
+  <script src="payment.js"></script>
 </body>
 </html>

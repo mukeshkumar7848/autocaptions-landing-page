@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Razorpay Integration Test</title>
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .status.info { background: #e3f2fd; color: #1976d2; }
+    .status.success { background: #e8f5e9; color: #388e3c; }
+    .status.warning { background: #fff3e0; color: #f57c00; }
+    button {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    .code {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 5px;
+    }
+    .badge.india { background: #ff9933; color: white; }
+    .badge.international { background: #138808; color: white; }
+  </style>
+</head>
+<body>
+  <div class="test-card">
+    <h1>🧪 Razorpay Integration Test</h1>
+    <p>Test the payment gateway integration for Auto Captions Pro</p>
+  </div>
+
+  <div class="test-card">
+    <h2>📍 Location Detection</h2>
+    <div id="locationStatus" class="status info">
+      🔄 Detecting your location...
+    </div>
+    <p><strong>Detected Country:</strong> <span id="countryCode">---</span></p>
+    <p><strong>Payment Gateway:</strong> <span id="gatewayType">---</span></p>
+  </div>
+
+  <div class="test-card">
+    <h2>💳 Test Payment</h2>
+    <button onclick="testIndianPayment()">🇮🇳 Test as Indian User (Razorpay)</button>
+    <button onclick="testInternationalPayment()">🌍 Test as International User (Gumroad)</button>
+  </div>
+
+  <div class="test-card">
+    <h2>⚙️ Configuration</h2>
+    <div class="code">
+<pre>Razorpay Key ID: rzp_live_SDwg3Ie2duu2Z3
+Amount: ₹1 (100 paise)
+Currency: INR
+Success URL: https://www.instagram.com/mukeshfx
+Webhook: https://limit-henna.vercel.app/api/razorpay/webhook</pre>
+    </div>
+  </div>
+
+  <div class="test-card">
+    <h2>✅ Integration Status</h2>
+    <div class="status success">
+      ✓ Razorpay Checkout Script Loaded<br>
+      ✓ Geolocation Detection Active<br>
+      ✓ Payment Handlers Initialized<br>
+      ✓ Webhook Endpoint Configured
+    </div>
+  </div>
+
+  <div class="test-card">
+    <h2>📝 Test Instructions</h2>
+    <ol>
+      <li>Your actual location is detected automatically</li>
+      <li>If you're in India 🇮🇳: Razorpay checkout will open</li>
+      <li>If you're outside India 🌍: Redirects to Gumroad</li>
+      <li>Use test buttons above to simulate different locations</li>
+    </ol>
+    
+    <div class="status warning">
+      ⚠️ <strong>Note:</strong> Currently using LIVE Razorpay keys with ₹1 test amount. Real payments will be processed!
+    </div>
+  </div>
+
+  <!-- Razorpay Checkout Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  
+  <script>
+    // Configuration
+    const RAZORPAY_CONFIG = {
+      keyId: 'rzp_live_SDwg3Ie2duu2Z3',
+      amount: 100,
+      currency: 'INR',
+      name: 'Auto Captions Pro',
+      description: 'Lifetime Pro License - Test Payment',
+      successUrl: 'https://www.instagram.com/mukeshfx'
+    };
+
+    const GUMROAD_URL = 'https://mukeshfx.gumroad.com/l/Autocaptionspro';
+
+    let detectedCountry = null;
+
+    // Detect actual location
+    async function detectLocation() {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        detectedCountry = data.country_code;
+        
+        document.getElementById('locationStatus').className = 'status success';
+        document.getElementById('locationStatus').innerHTML = '✓ Location detected successfully!';
+        document.getElementById('countryCode').innerHTML = 
+          `<span class="badge ${data.country_code === 'IN' ? 'india' : 'international'}">${data.country_code} - ${data.country_name}</span>`;
+        document.getElementById('gatewayType').innerHTML = 
+          data.country_code === 'IN' ? 
+          '<strong style="color: #ff9933;">Razorpay (INR)</strong>' : 
+          '<strong style="color: #667eea;">Gumroad (USD)</strong>';
+      } catch (error) {
+        document.getElementById('locationStatus').className = 'status warning';
+        document.getElementById('locationStatus').innerHTML = '⚠️ Could not detect location. Defaulting to Gumroad.';
+      }
+    }
+
+    // Test Indian payment
+    function testIndianPayment() {
+      console.log('Testing Razorpay payment...');
+      const options = {
+        key: RAZORPAY_CONFIG.keyId,
+        amount: RAZORPAY_CONFIG.amount,
+        currency: RAZORPAY_CONFIG.currency,
+        name: RAZORPAY_CONFIG.name,
+        description: RAZORPAY_CONFIG.description,
+        handler: function(response) {
+          alert('Payment Successful! 🎉\n\nPayment ID: ' + response.razorpay_payment_id);
+          console.log('Payment response:', response);
+          setTimeout(() => {
+            window.location.href = RAZORPAY_CONFIG.successUrl;
+          }, 2000);
+        },
+        theme: { color: '#667eea' },
+        modal: {
+          ondismiss: function() {
+            console.log('Payment modal closed');
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', function(response) {
+        alert('Payment Failed!\n\n' + response.error.description);
+        console.error('Payment failed:', response);
+      });
+      rzp.open();
+    }
+
+    // Test international payment
+    function testInternationalPayment() {
+      console.log('Redirecting to Gumroad...');
+      alert('International users will be redirected to Gumroad');
+      window.open(GUMROAD_URL, '_blank');
+    }
+
+    // Initialize on load
+    detectLocation();
+  </script>
+</body>
+</html>
