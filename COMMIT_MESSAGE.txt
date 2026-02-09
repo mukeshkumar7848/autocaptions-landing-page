@@ -1,0 +1,38 @@
+# Git Commit Message
+
+```bash
+git add .
+git commit -m "✨ Add license key generation and delivery system
+
+- Generate unique license keys (ACPRO-XXXXX format)
+- Display beautiful modal with copy/download options
+- Send license data to webhook for email delivery
+- Store license backup in localStorage
+- Add download as .txt file functionality
+- Enhanced webhook payload with customer info
+- Create backend webhook handler template
+- Add comprehensive documentation
+
+Files:
+- payment.js: License generation and modal UI
+- webhook-handler.js: Backend template (NEW)
+- LICENSE_SYSTEM.md: Complete documentation (NEW)
+- LICENSE_FLOW_VISUAL.txt: Visual diagrams (NEW)
+- LICENSE_IMPLEMENTATION.md: Implementation guide (NEW)
+- test-payment.html: Updated with license features
+
+License format: ACPRO-8H3K2-9M4L7-P6N8W-2R5T9
+Webhook: https://limit-henna.vercel.app/api/razorpay/webhook
+
+Next: Deploy webhook handler and configure email service"
+
+git push origin main
+```
+
+Or shorter version:
+
+```bash
+git add .
+git commit -m "✨ Add license key system with copy/download & webhook integration"
+git push origin main
+```
