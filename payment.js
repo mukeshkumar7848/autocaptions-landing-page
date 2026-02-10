@@ -119,22 +119,37 @@ function generateLicenseKey() {
 // ================================================
 async function detectUserLocation() {
   try {
+    console.log('🌍 Detecting user location...');
     const response = await fetch('https://ipapi.co/json/');
     const data = await response.json();
     userCountry = data.country_code;
     isIndianUser = (userCountry === 'IN');
     
-    console.log('Detected country:', userCountry, '| Is Indian user:', isIndianUser);
+    console.log('✅ Detected country:', userCountry, '| Is Indian user:', isIndianUser);
     updatePaymentUI();
   } catch (error) {
-    console.warn('Geolocation failed:', error);
-    console.log('🇮🇳 Defaulting to India (Razorpay) - User can switch if needed');
+    console.warn('❌ Primary geolocation failed, trying fallback...', error);
     
-    // Default to India/Razorpay instead of Gumroad
-    // Most users will be from India for this product
-    isIndianUser = true;
-    userCountry = 'IN';
-    updatePaymentUI();
+    // Try fallback geolocation service
+    try {
+      const fallbackResponse = await fetch('https://api.country.is/');
+      const fallbackData = await fallbackResponse.json();
+      userCountry = fallbackData.country;
+      isIndianUser = (userCountry === 'IN');
+      
+      console.log('✅ Fallback detected country:', userCountry, '| Is Indian user:', isIndianUser);
+      updatePaymentUI();
+    } catch (fallbackError) {
+      console.error('❌ All geolocation services failed');
+      
+      // Default to international (Gumroad) for safety
+      // User can manually switch if they're from India
+      isIndianUser = false;
+      userCountry = 'UNKNOWN';
+      
+      console.log('⚠️ Defaulting to Gumroad (international payment)');
+      updatePaymentUI();
+    }
   }
 }
 
@@ -144,27 +159,50 @@ async function detectUserLocation() {
 function updatePaymentUI() {
   const regionInfo = document.getElementById('paymentRegionInfo');
   
+  if (!regionInfo) return;
+  
   if (isIndianUser) {
-    if (regionInfo) {
-      regionInfo.innerHTML = '🇮🇳 Indian users: Special INR pricing available! <span style="opacity:0.6; font-size:12px; cursor:pointer;" onclick="window.switchPaymentMethod()">Switch to Gumroad</span>';
-      regionInfo.style.color = '#00D88A';
-      regionInfo.style.fontWeight = '600';
-    }
+    regionInfo.innerHTML = `
+      <span style="color: #00D88A; font-weight: 600;">
+        🇮🇳 Indian users: Pay ₹999 via Razorpay
+      </span>
+      <br>
+      <span style="opacity: 0.7; font-size: 12px;">
+        Not in India? <a href="#" onclick="event.preventDefault(); window.switchToGumroad();" style="color: #667eea; text-decoration: underline; cursor: pointer;">Switch to International Payment ($49)</a>
+      </span>
+    `;
   } else {
-    if (regionInfo) {
-      regionInfo.innerHTML = '🌍 International payment via Gumroad <span style="opacity:0.6; font-size:12px; cursor:pointer;" onclick="window.switchPaymentMethod()">Switch to Razorpay (₹)</span>';
-      regionInfo.style.opacity = '0.7';
-    }
+    regionInfo.innerHTML = `
+      <span style="color: #667eea; font-weight: 600;">
+        🌍 International users: Pay $49 via Gumroad
+      </span>
+      <br>
+      <span style="opacity: 0.7; font-size: 12px;">
+        From India? <a href="#" onclick="event.preventDefault(); window.switchToRazorpay();" style="color: #00D88A; text-decoration: underline; cursor: pointer;">Switch to INR Payment (₹999)</a>
+      </span>
+    `;
   }
 }
 
 // ================================================
-// MANUAL PAYMENT METHOD SWITCH
+// MANUAL PAYMENT METHOD SWITCHES
 // ================================================
-window.switchPaymentMethod = function() {
-  isIndianUser = !isIndianUser;
-  console.log('💱 Switched payment method. Indian user:', isIndianUser);
-  updatePaymentUI();
+window.switchToRazorpay = function() {
+  if (confirm('Switch to Razorpay payment (₹999 for Indian users)?')) {
+    isIndianUser = true;
+    userCountry = 'IN';
+    console.log('💱 Switched to Razorpay (India)');
+    updatePaymentUI();
+  }
+};
+
+window.switchToGumroad = function() {
+  if (confirm('Switch to Gumroad payment ($49 for international users)?')) {
+    isIndianUser = false;
+    userCountry = 'INTL';
+    console.log('💱 Switched to Gumroad (International)');
+    updatePaymentUI();
+  }
 };
 
 // ================================================
@@ -573,9 +611,15 @@ function proceedToDownload() {
 // BUTTON CLICK HANDLERS
 // ================================================
 function handleGetProClick() {
+  console.log('🎯 Get Pro button clicked');
+  console.log('📍 User location:', userCountry);
+  console.log('🇮🇳 Is Indian user:', isIndianUser);
+  
   if (isIndianUser) {
+    console.log('💳 Opening Razorpay payment (₹999)');
     initiateRazorpayPayment();
   } else {
+    console.log('🌍 Redirecting to Gumroad ($49)');
     // Redirect to Gumroad for international users
     window.open('https://mukeshfx.gumroad.com/l/Autocaptionspro', '_blank');
   }
