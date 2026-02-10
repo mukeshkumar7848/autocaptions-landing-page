@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Razorpay Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Razorpay Payment</h1>
+        <p style="color: #666; margin-bottom: 20px;">Test your payment integration</p>
+        
+        <button onclick="testOrderCreation()">1. Test Order Creation</button>
+        <button onclick="testFullPayment()">2. Test Full Payment (₹1)</button>
+        
+        <div id="status"></div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: left;">
+            <h3 style="color: #667eea; margin-bottom: 10px;">Test Card Details:</h3>
+            <div style="font-family: monospace; font-size: 13px;">
+                <div>Card: 4111 1111 1111 1111</div>
+                <div>CVV: 123</div>
+                <div>Expiry: 12/28</div>
+                <div>Name: Test User</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://limit-henna.vercel.app/api/razorpay/create-order';
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.innerHTML = message;
+            status.className = type;
+            status.style.display = 'block';
+        }
+        
+        async function testOrderCreation() {
+            showStatus('⏳ Testing order creation...', 'info');
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: 100,
+                        currency: 'INR',
+                        receipt: 'test_' + Date.now()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus(
+                        '✅ Order Creation Successful!<br><br>' +
+                        '<strong>Order ID:</strong> ' + data.order_id + '<br>' +
+                        '<strong>Amount:</strong> ₹' + (data.amount / 100) + '<br>' +
+                        '<strong>Key ID:</strong> ' + data.key_id,
+                        'success'
+                    );
+                } else {
+                    showStatus('❌ Order creation failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function testFullPayment() {
+            showStatus('⏳ Creating order...', 'info');
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: 100,
+                        currency: 'INR',
+                        receipt: 'test_' + Date.now(),
+                        notes: {
+                            product: 'Auto Captions Pro',
+                            type: 'test_payment'
+                        }
+                    })
+                });
+                
+                const orderData = await response.json();
+                
+                if (!orderData.success) {
+                    throw new Error(orderData.error || 'Failed to create order');
+                }
+                
+                showStatus('✅ Order created! Opening Razorpay...', 'success');
+                
+                // Open Razorpay checkout
+                const options = {
+                    key: orderData.key_id,
+                    amount: orderData.amount,
+                    currency: orderData.currency,
+                    name: 'Auto Captions Pro',
+                    description: 'Test Payment',
+                    order_id: orderData.order_id,
+                    handler: function(response) {
+                        showStatus(
+                            '🎉 Payment Successful!<br><br>' +
+                            '<strong>Payment ID:</strong> ' + response.razorpay_payment_id + '<br>' +
+                            '<strong>Order ID:</strong> ' + response.razorpay_order_id + '<br>' +
+                            '<strong>Signature:</strong> ' + response.razorpay_signature.substring(0, 20) + '...',
+                            'success'
+                        );
+                    },
+                    prefill: {
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        contact: '9876543210'
+                    },
+                    theme: {
+                        color: '#667eea'
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            showStatus('❌ Payment cancelled by user', 'error');
+                        }
+                    }
+                };
+                
+                const razorpay = new Razorpay(options);
+                
+                razorpay.on('payment.failed', function(response) {
+                    showStatus(
+                        '❌ Payment Failed!<br><br>' +
+                        '<strong>Error:</strong> ' + response.error.description,
+                        'error'
+                    );
+                });
+                
+                razorpay.open();
+                
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

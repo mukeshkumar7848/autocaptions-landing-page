@@ -1,43 +1,117 @@
 // ================================================
-// RAZORPAY PAYMENT INTEGRATION
-// Auto-detects user location and shows appropriate payment method
+// AUTO CAPTIONS PRO - PAYMENT SYSTEM
+// Razorpay Integration with Order Creation & Email
 // ================================================
 
+// ================================================
+// CONFIGURATION
+// ================================================
 const RAZORPAY_CONFIG = {
-  keyId: 'rzp_live_SDwg3Ie2duu2Z3',
-  amount: 100, // Amount in paise (₹1 = 100 paise)
+  keyId: null, // Will be fetched from server
+  amount: 999000, // Amount in paise (₹1 = 100 paise for testing)
   currency: 'INR',
   name: 'Auto Captions Pro',
   description: 'Lifetime Pro License',
   image: '../client/assets/logo.png',
   successUrl: 'https://www.instagram.com/mukeshfx',
-  webhookUrl: 'https://limit-henna.vercel.app/api/razorpay/webhook',
-  licenseApiUrl: 'https://limit-henna.vercel.app/api/razorpay/generate-license'
+  createOrderUrl: 'https://limit-henna.vercel.app/api/razorpay/create-order',
+  webhookUrl: 'https://limit-henna.vercel.app/api/razorpay/webhook'
 };
 
-const GUMROAD_URL = 'https://mukeshfx.gumroad.com/l/Autocaptionspro';
-let userCountry = null;
+// ================================================
+// GLOBAL VARIABLES
+// ================================================
 let isIndianUser = false;
-let userEmail = '';
-let userContact = '';
+let userCountry = '';
+let collectedEmail = ''; // Store email for payment
 
 // ================================================
-// LICENSE KEY GENERATION (Client-side fallback)
+// EMAIL COLLECTION HELPER
+// ================================================
+function collectEmailForPayment() {
+  return new Promise((resolve, reject) => {
+    const modal = document.createElement('div');
+    modal.className = 'payment-modal-overlay';
+    modal.style.opacity = '1';
+    modal.innerHTML = `
+      <div class="payment-modal" style="transform: translateY(0) scale(1);">
+        <h2 style="color: #667eea; margin-bottom: 10px;">📧 Enter Your Email</h2>
+        <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+          We'll send your license key to this email address
+        </p>
+        
+        <input 
+          type="email" 
+          id="emailInput" 
+          placeholder="your@email.com"
+          required
+          style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 20px;"
+        />
+        
+        <div style="display: flex; gap: 10px;">
+          <button onclick="document.getElementById('emailModalCancel').click()" 
+                  style="flex: 1; background: #f0f0f0; color: #666; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+            Cancel
+          </button>
+          <button id="emailModalContinue" 
+                  style="flex: 1; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+            Continue to Payment
+          </button>
+        </div>
+        <button id="emailModalCancel" style="display: none;"></button>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const emailInput = document.getElementById('emailInput');
+    const continueBtn = document.getElementById('emailModalContinue');
+    const cancelBtn = document.getElementById('emailModalCancel');
+    
+    emailInput.focus();
+    
+    continueBtn.onclick = () => {
+      const email = emailInput.value.trim();
+      if (!email || !email.includes('@')) {
+        emailInput.style.borderColor = 'red';
+        emailInput.placeholder = 'Please enter a valid email';
+        return;
+      }
+      modal.remove();
+      resolve(email);
+    };
+    
+    cancelBtn.onclick = () => {
+      modal.remove();
+      reject(new Error('Email collection cancelled'));
+    };
+    
+    emailInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        continueBtn.click();
+      }
+    });
+  });
+}
+
+// ================================================
+// LICENSE KEY GENERATION
 // ================================================
 function generateLicenseKey() {
-  // Format: ACPRO-XXXXX-XXXXX-XXXXX-XXXXX
-  const segments = [];
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing chars
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclude confusing chars
+  const segments = 5;
+  const segmentLength = 5;
   
-  for (let i = 0; i < 4; i++) {
-    let segment = '';
-    for (let j = 0; j < 5; j++) {
-      segment += chars.charAt(Math.floor(Math.random() * chars.length));
+  let key = 'ACPRO';
+  
+  for (let i = 0; i < segments; i++) {
+    key += '-';
+    for (let j = 0; j < segmentLength; j++) {
+      key += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    segments.push(segment);
   }
   
-  return 'ACPRO-' + segments.join('-');
+  return key;
 }
 
 // ================================================
@@ -45,7 +119,6 @@ function generateLicenseKey() {
 // ================================================
 async function detectUserLocation() {
   try {
-    // Try multiple geolocation services for reliability
     const response = await fetch('https://ipapi.co/json/');
     const data = await response.json();
     userCountry = data.country_code;
@@ -54,9 +127,13 @@ async function detectUserLocation() {
     console.log('Detected country:', userCountry, '| Is Indian user:', isIndianUser);
     updatePaymentUI();
   } catch (error) {
-    console.warn('Geolocation failed, falling back to Gumroad:', error);
-    // Fallback: Show both options or default to Gumroad
-    isIndianUser = false;
+    console.warn('Geolocation failed:', error);
+    console.log('🇮🇳 Defaulting to India (Razorpay) - User can switch if needed');
+    
+    // Default to India/Razorpay instead of Gumroad
+    // Most users will be from India for this product
+    isIndianUser = true;
+    userCountry = 'IN';
     updatePaymentUI();
   }
 }
@@ -69,145 +146,213 @@ function updatePaymentUI() {
   
   if (isIndianUser) {
     if (regionInfo) {
-      regionInfo.innerHTML = '🇮🇳 Indian users: Special INR pricing available!';
+      regionInfo.innerHTML = '🇮🇳 Indian users: Special INR pricing available! <span style="opacity:0.6; font-size:12px; cursor:pointer;" onclick="window.switchPaymentMethod()">Switch to Gumroad</span>';
       regionInfo.style.color = '#00D88A';
       regionInfo.style.fontWeight = '600';
     }
   } else {
     if (regionInfo) {
-      regionInfo.innerHTML = '🌍 International payment via Gumroad';
+      regionInfo.innerHTML = '🌍 International payment via Gumroad <span style="opacity:0.6; font-size:12px; cursor:pointer;" onclick="window.switchPaymentMethod()">Switch to Razorpay (₹)</span>';
       regionInfo.style.opacity = '0.7';
     }
   }
 }
 
 // ================================================
-// RAZORPAY PAYMENT HANDLER
+// MANUAL PAYMENT METHOD SWITCH
 // ================================================
-function initiateRazorpayPayment() {
-  // Create order options
-  const options = {
-    key: RAZORPAY_CONFIG.keyId,
-    amount: RAZORPAY_CONFIG.amount,
-    currency: RAZORPAY_CONFIG.currency,
-    name: RAZORPAY_CONFIG.name,
-    description: RAZORPAY_CONFIG.description,
-    image: RAZORPAY_CONFIG.image,
-    
-    // Handler for successful payment
-    handler: function(response) {
-      handlePaymentSuccess(response);
-    },
-    
-    // Prefill customer details (optional)
-    prefill: {
-      name: '',
-      email: '',
-      contact: ''
-    },
-    
-    // Theme customization
-    theme: {
-      color: '#667eea'
-    },
-    
-    // Modal settings
-    modal: {
-      ondismiss: function() {
-        console.log('Payment modal closed');
-      },
-      escape: true,
-      backdropclose: true,
-      // Capture customer data before payment
-      confirm_close: false
-    },
-    
-    // Retry settings
-    retry: {
-      enabled: true,
-      max_count: 3
-    },
-    
-    // Capture customer data
-    callback_url: null,
-    redirect: false
-  };
+window.switchPaymentMethod = function() {
+  isIndianUser = !isIndianUser;
+  console.log('💱 Switched payment method. Indian user:', isIndianUser);
+  updatePaymentUI();
+};
 
-  // Create Razorpay instance and open checkout
-  const rzp = new Razorpay(options);
-  
-  // Handle payment failure
-  rzp.on('payment.failed', function(response) {
-    handlePaymentFailure(response);
-  });
-  
-  // Open Razorpay checkout modal
-  rzp.open();
+// ================================================
+// RAZORPAY PAYMENT HANDLER (with Order Creation)
+// ================================================
+async function initiateRazorpayPayment() {
+  try {
+    console.log('🚀 Initiating payment flow...');
+    
+    // Collect email first (to ensure we have it for license delivery)
+    let userEmail;
+    try {
+      userEmail = await collectEmailForPayment();
+      console.log('📧 User email collected:', userEmail);
+      collectedEmail = userEmail; // Store globally
+    } catch (error) {
+      console.log('User cancelled email input');
+      return; // User cancelled
+    }
+    
+    // Step 1: Create order on server (license key will be generated there)
+    const orderResponse = await fetch(RAZORPAY_CONFIG.createOrderUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: RAZORPAY_CONFIG.amount,
+        currency: RAZORPAY_CONFIG.currency,
+        receipt: `receipt_${Date.now()}`,
+        email: userEmail, // Send email so server can include it in order notes
+        notes: {
+          product: 'Auto Captions Pro',
+          type: 'lifetime_license'
+        }
+      })
+    });
+
+    if (!orderResponse.ok) {
+      throw new Error('Failed to create order');
+    }
+
+    const orderData = await orderResponse.json();
+    console.log('📦 Order created:', orderData);
+    console.log('🔑 License key from server:', orderData.license_key);
+    console.log('🔍 Full orderData keys:', Object.keys(orderData));
+    console.log('🔍 orderData stringified:', JSON.stringify(orderData, null, 2));
+
+    if (!orderData.success) {
+      throw new Error(orderData.message || 'Failed to create order');
+    }
+    
+    // Store the license key from server (not generating on frontend anymore)
+    const serverLicenseKey = orderData.license_key;
+    
+    if (!serverLicenseKey) {
+      console.error('❌ Server did not return license key!');
+      console.error('📋 OrderData received:', orderData);
+    }
+
+    // Step 2: Open Razorpay checkout with the order
+    const options = {
+      key: orderData.key_id || RAZORPAY_CONFIG.keyId,
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: RAZORPAY_CONFIG.name,
+      description: RAZORPAY_CONFIG.description,
+      order_id: orderData.order_id,
+      image: RAZORPAY_CONFIG.image,
+      
+      // Handler for successful payment
+      handler: function(response) {
+        console.log('✅ Payment successful:', response);
+        // Pass email to handler
+        response.email = userEmail;
+        handlePaymentSuccess(response, orderData);
+      },
+      
+      // Prefill customer details with the email they provided
+      prefill: {
+        name: '',
+        email: userEmail,
+        contact: ''
+      },
+      
+      // Make fields readonly
+      readonly: {
+        email: true, // Lock email since we already collected it
+        contact: false,
+        name: false
+      },
+      
+      // Theme customization
+      theme: {
+        color: '#667eea'
+      },
+      
+      // Modal settings
+      modal: {
+        ondismiss: function() {
+          console.log('❌ Payment cancelled by user');
+        },
+        escape: true,
+        backdropclose: true,
+        confirm_close: false
+      },
+      
+      // Retry settings
+      retry: {
+        enabled: true,
+        max_count: 3
+      }
+    };
+
+    // Create Razorpay instance
+    const razorpay = new Razorpay(options);
+    
+    // Handle payment failure
+    razorpay.on('payment.failed', function(response) {
+      console.error('❌ Payment failed:', response.error);
+      handlePaymentFailure(response);
+    });
+
+    // Open Razorpay checkout modal
+    razorpay.open();
+
+  } catch (error) {
+    console.error('❌ Error creating order:', error);
+    alert('❌ Error: ' + error.message + '\n\nPlease check:\n1. Your internet connection\n2. Server is running\n3. Contact support if issue persists');
+  }
 }
 
 // ================================================
 // PAYMENT SUCCESS HANDLER
 // ================================================
-async function handlePaymentSuccess(response) {
-  console.log('Payment successful:', response);
+async function handlePaymentSuccess(response, orderData) {
+  console.log('✅ Processing payment success...');
+  console.log('📦 Razorpay Response:', response);
+  console.log('📦 OrderData received:', orderData);
   
-  // Generate license key
-  const licenseKey = generateLicenseKey();
+  // Use license key from server (generated during order creation)
+  let licenseKey = orderData.license_key;
   
-  // Get payment details from Razorpay
-  let customerEmail = '';
-  let customerContact = '';
-  
-  try {
-    // Try to get customer details from Razorpay response
-    // Note: In production, you should fetch this from your backend
-    customerEmail = userEmail || '';
-    customerContact = userContact || '';
-  } catch (error) {
-    console.warn('Could not extract customer details:', error);
+  // Fallback: If server didn't provide license key, generate one (shouldn't happen)
+  if (!licenseKey) {
+    console.warn('⚠️ Server did not provide license key, generating fallback');
+    licenseKey = generateLicenseKey();
   }
   
-  // Send payment details and license to webhook
+  console.log('🔑 Using server-generated license:', licenseKey);
+  
+  // Extract email and contact from Razorpay response or use collected email
+  const customerEmail = response.email || collectedEmail || '';
+  const customerContact = response.contact || '';
+  
+  console.log('📧 Customer email:', customerEmail);
+  console.log('📱 Customer contact:', customerContact);
+  
+  // Store license locally first (backup)
   try {
-    const webhookData = {
-      razorpay_payment_id: response.razorpay_payment_id,
-      razorpay_order_id: response.razorpay_order_id,
-      razorpay_signature: response.razorpay_signature,
-      event: 'payment.captured',
-      license_key: licenseKey,
-      customer_email: customerEmail,
-      customer_contact: customerContact,
-      amount: RAZORPAY_CONFIG.amount,
-      currency: RAZORPAY_CONFIG.currency,
-      product: 'Auto Captions Pro - Lifetime License',
+    const paymentRecord = {
+      licenseKey: licenseKey,
+      paymentId: response.razorpay_payment_id,
+      orderId: response.razorpay_order_id,
+      email: customerEmail,
       timestamp: new Date().toISOString()
     };
     
-    console.log('Sending to webhook:', webhookData);
+    localStorage.setItem('ac_pro_license_' + response.razorpay_payment_id, licenseKey);
+    localStorage.setItem('ac_pro_payment_' + response.razorpay_payment_id, JSON.stringify(paymentRecord));
     
-    await fetch(RAZORPAY_CONFIG.webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(webhookData)
-    });
-    
-    console.log('Webhook notification sent successfully');
+    console.log('💾 License saved to localStorage');
   } catch (error) {
-    console.warn('Webhook notification failed:', error);
+    console.error('⚠️ Failed to save to localStorage:', error);
   }
   
-  // Store license key in localStorage as backup
-  localStorage.setItem('ac_pro_license_' + response.razorpay_payment_id, licenseKey);
+  // Razorpay will automatically call our webhook with signature verification
+  // No need to call it from frontend - this eliminates CORS issues
+  console.log('📧 Email will be sent automatically via Razorpay webhook');
+  console.log('💡 Make sure webhook is configured at: https://dashboard.razorpay.com/app/webhooks');
+  console.log('📍 Webhook URL: https://limit-henna.vercel.app/api/razorpay/webhook');
+  console.log('� License key that will be emailed:', licenseKey);
   
-  // Show success modal with license key
+  // Show success modal with license key immediately
   showPaymentSuccessModal({
     paymentId: response.razorpay_payment_id,
     orderId: response.razorpay_order_id,
     signature: response.razorpay_signature,
     licenseKey: licenseKey,
-    customerEmail: customerEmail
+    email: customerEmail
   });
 }
 
@@ -215,19 +360,25 @@ async function handlePaymentSuccess(response) {
 // PAYMENT FAILURE HANDLER
 // ================================================
 function handlePaymentFailure(response) {
-  console.error('Payment failed:', response);
+  console.error('❌ Payment failed:', response);
   
   const errorMessage = response.error ? 
-    `${response.error.description || 'Payment failed'}` : 
+    `${response.error.description || 'Payment failed'}\n\nReason: ${response.error.reason || 'Unknown'}` : 
     'Payment was unsuccessful. Please try again.';
   
-  showPaymentFailureModal(errorMessage);
+  alert('❌ Payment Failed!\n\n' + errorMessage + '\n\nPlease try again or contact support.');
 }
 
 // ================================================
-// PAYMENT SUCCESS MODAL
+// SUCCESS MODAL
 // ================================================
 function showPaymentSuccessModal(paymentData) {
+  // Remove existing modal if any
+  const existingModal = document.getElementById('licenseModal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
   const modal = document.createElement('div');
   modal.className = 'payment-modal-overlay';
   modal.id = 'licenseModal';
@@ -248,415 +399,280 @@ function showPaymentSuccessModal(paymentData) {
         <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
           <input type="text" id="licenseKeyDisplay" value="${paymentData.licenseKey}" 
                  readonly 
-                 style="width: 100%; border: none; background: transparent; text-align: center; font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold; color: #667eea; outline: none; cursor: text;">
+                 style="width: 100%; font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold; text-align: center; background: transparent; border: none; color: #667eea; letter-spacing: 1px;" 
+                 onclick="this.select()">
         </div>
-        <button onclick="copyLicenseKey('${paymentData.licenseKey}')" 
-                style="background: white; color: #667eea; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s ease;">
-          📋 Copy License Key
-        </button>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="copyLicenseKey('${paymentData.licenseKey}')" 
+                  style="flex: 1; background: white; color: #667eea; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">
+            📋 Copy Key
+          </button>
+          <button onclick="downloadLicenseKey('${paymentData.licenseKey}', '${paymentData.paymentId}')" 
+                  style="flex: 1; background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">
+            💾 Download
+          </button>
+        </div>
       </div>
-      
-      <!-- Instructions -->
-      <div style="background: #f0f7ff; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left; border-left: 4px solid #667eea;">
-        <p style="font-size: 14px; color: #333; margin: 5px 0;"><strong>📝 Next Steps:</strong></p>
-        <ol style="font-size: 13px; color: #555; margin: 10px 0 5px 20px; padding-left: 10px; line-height: 1.8;">
-          <li>Copy your license key above</li>
-          <li>Download Auto Captions Pro extension</li>
-          <li>Open After Effects and activate using this key</li>
-          <li>Enjoy unlimited pro features! 🚀</li>
-        </ol>
+
+      <!-- Email Notification -->
+      <div style="background: #FFF3CD; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFC107;">
+        <p style="color: #856404; font-size: 14px; margin: 0;">
+          📧 A copy has been sent to your email address.<br>
+          <small style="opacity: 0.8;">Check your inbox (and spam folder) for license details.</small>
+        </p>
       </div>
       
       <!-- Payment Details -->
-      <details style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left; cursor: pointer;">
-        <summary style="font-size: 14px; font-weight: 600; color: #666; cursor: pointer;">Payment Details</summary>
-        <div style="margin-top: 10px; font-size: 13px; color: #888; line-height: 1.8;">
-          <p style="margin: 5px 0;"><strong>Payment ID:</strong> ${paymentData.paymentId}</p>
-          ${paymentData.customerEmail ? `<p style="margin: 5px 0;"><strong>Email:</strong> ${paymentData.customerEmail}</p>` : ''}
+      <div style="background: #F8F9FA; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 13px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #666;">Payment ID:</span>
+          <span style="color: #0A0A1A; font-family: monospace; font-size: 12px;">${paymentData.paymentId}</span>
         </div>
-      </details>
-      
-      <!-- Action Buttons -->
-      <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button onclick="downloadLicenseKey('${paymentData.licenseKey}', '${paymentData.paymentId}')" 
-                class="btn-secondary" 
-                style="flex: 1; padding: 12px; border: 2px solid #667eea; background: white; color: #667eea; border-radius: 8px; font-weight: 600; cursor: pointer;">
-          💾 Save as File
-        </button>
-        <button onclick="proceedToDownload()" 
-                class="btn-primary" 
-                style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-          Continue →
-        </button>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #666;">Order ID:</span>
+          <span style="color: #0A0A1A; font-family: monospace; font-size: 12px;">${paymentData.orderId}</span>
+        </div>
+      </div>
+
+      <!-- Instructions -->
+      <div style="background: #E8F4FD; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196F3;">
+        <p style="color: #0D47A1; font-size: 14px; font-weight: 600; margin-bottom: 8px;">📝 How to Activate:</p>
+        <ol style="color: #1565C0; font-size: 13px; margin: 0; padding-left: 20px; line-height: 1.8;">
+          <li>Open Adobe After Effects</li>
+          <li>Go to Window → Extensions → Auto Captions Pro</li>
+          <li>Click "Activate License"</li>
+          <li>Paste your license key and click "Activate"</li>
+        </ol>
       </div>
       
-      <p style="font-size: 12px; color: #888; margin-top: 15px;">
-        💌 License key has been sent to your email (if provided)
+      <button onclick="proceedToDownload()" class="btn-primary" style="width: 100%; margin-top: 10px;">
+        Continue to Download →
+      </button>
+      
+      <p style="margin-top: 15px; font-size: 12px; color: #999; text-align: center;">
+        Need help? Contact support with your Payment ID
       </p>
     </div>
   `;
   
   document.body.appendChild(modal);
   
-  // Add animation
-  setTimeout(() => modal.classList.add('show'), 10);
-  
-  // Prevent closing by clicking outside or ESC (force user to copy license)
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      e.preventDefault();
-      // Flash the license key section to draw attention
-      const licenseSection = modal.querySelector('[style*="linear-gradient"]');
-      if (licenseSection) {
-        licenseSection.style.animation = 'pulse 0.5s ease-in-out';
-        setTimeout(() => {
-          licenseSection.style.animation = '';
-        }, 500);
-      }
-    }
-  });
+  // Animate in
+  setTimeout(() => {
+    modal.style.opacity = '1';
+    modal.querySelector('.payment-modal').style.transform = 'translateY(0) scale(1)';
+  }, 10);
 }
 
-// Copy license key function
-window.copyLicenseKey = function(licenseKey) {
-  const input = document.getElementById('licenseKeyDisplay');
-  if (input) {
-    input.select();
-    input.setSelectionRange(0, 99999); // For mobile
+// ================================================
+// COPY LICENSE KEY
+// ================================================
+function copyLicenseKey(licenseKey) {
+  // Try modern clipboard API first
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(licenseKey).then(() => {
+      showCopyFeedback('Copied to clipboard! ✓');
+    }).catch(() => {
+      fallbackCopy(licenseKey);
+    });
+  } else {
+    fallbackCopy(licenseKey);
   }
+}
+
+function fallbackCopy(licenseKey) {
+  const input = document.getElementById('licenseKeyDisplay');
+  input.select();
+  input.setSelectionRange(0, 99999); // For mobile
   
-  navigator.clipboard.writeText(licenseKey).then(() => {
-    // Show success feedback
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '✓ Copied!';
-    btn.style.background = '#00D88A';
-    btn.style.color = 'white';
-    
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-      btn.style.background = 'white';
-      btn.style.color = '#667eea';
-    }, 2000);
-  }).catch(err => {
-    alert('Failed to copy. Please select and copy manually: ' + licenseKey);
-  });
-};
+  try {
+    document.execCommand('copy');
+    showCopyFeedback('Copied to clipboard! ✓');
+  } catch (err) {
+    showCopyFeedback('Please manually copy the key');
+  }
+}
 
-// Download license key as text file
-window.downloadLicenseKey = function(licenseKey, paymentId) {
+function showCopyFeedback(message) {
+  const button = event.target;
+  const originalText = button.textContent;
+  button.textContent = message;
+  button.style.background = '#00D88A';
+  button.style.color = 'white';
+  
+  setTimeout(() => {
+    button.textContent = originalText;
+    button.style.background = 'white';
+    button.style.color = '#667eea';
+  }, 2000);
+}
+
+// ================================================
+// DOWNLOAD LICENSE KEY
+// ================================================
+function downloadLicenseKey(licenseKey, paymentId) {
   const content = `
-AUTO CAPTIONS PRO - LICENSE KEY
-================================
+╔══════════════════════════════════════════════╗
+║     AUTO CAPTIONS PRO - LICENSE KEY          ║
+╚══════════════════════════════════════════════╝
 
-License Key: ${licenseKey}
+LICENSE KEY:
+${licenseKey}
+
+PAYMENT DETAILS:
 Payment ID: ${paymentId}
 Date: ${new Date().toLocaleString()}
-Product: Auto Captions Pro - Lifetime License
 
 ACTIVATION INSTRUCTIONS:
-1. Download and install Auto Captions Pro extension
-2. Open Adobe After Effects
-3. Go to Window > Extensions > Auto Captions Pro
-4. Click "Activate License"
-5. Paste the license key above
-6. Enjoy unlimited pro features!
+1. Open Adobe After Effects
+2. Go to Window → Extensions → Auto Captions Pro
+3. Click "Activate License"
+4. Paste your license key and click "Activate"
 
-Support: https://www.instagram.com/mukeshfx
-Documentation: https://autocaptionspro.com
+IMPORTANT NOTES:
+• Keep this license key safe
+• This is a lifetime license with free updates
+• For support, contact us with your Payment ID
+• Visit: https://mukeshfx.com for documentation
 
-================================
-Keep this file safe for future reference.
+Thank you for choosing Auto Captions Pro! 🎉
 `;
-  
+
   const blob = new Blob([content], { type: 'text/plain' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `AutoCaptionsPro-License-${paymentId.substring(0, 8)}.txt`;
+  a.download = `AutoCaptions-Pro-License-${paymentId}.txt`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   window.URL.revokeObjectURL(url);
   
-  // Show feedback
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '✓ Downloaded!';
+  // Visual feedback
+  const button = event.target;
+  const originalText = button.textContent;
+  button.textContent = '✓ Downloaded';
+  button.style.background = '#00D88A';
+  button.style.borderColor = '#00D88A';
+  
   setTimeout(() => {
-    btn.innerHTML = originalText;
+    button.textContent = originalText;
+    button.style.background = 'rgba(255,255,255,0.2)';
+    button.style.borderColor = 'white';
   }, 2000);
-};
-
-// Proceed to Instagram
-window.proceedToDownload = function() {
-  const modal = document.getElementById('licenseModal');
-  if (modal) {
-    modal.classList.remove('show');
-    setTimeout(() => {
-      modal.remove();
-      window.location.href = RAZORPAY_CONFIG.successUrl;
-    }, 300);
-  }
-};
-
-// ================================================
-// PAYMENT FAILURE MODAL
-// ================================================
-function showPaymentFailureModal(errorMessage) {
-  const modal = document.createElement('div');
-  modal.className = 'payment-modal-overlay';
-  modal.innerHTML = `
-    <div class="payment-modal">
-      <div class="payment-modal-icon failure">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M15 9l-6 6M9 9l6 6"/>
-        </svg>
-      </div>
-      <h2 style="color: #0A0A1A; margin: 20px 0 10px;">Payment Failed</h2>
-      <p style="color: #666; margin-bottom: 20px;">${errorMessage}</p>
-      <button class="btn-large btn-primary-large" onclick="this.closest('.payment-modal-overlay').remove()">
-        Try Again
-      </button>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  setTimeout(() => modal.classList.add('show'), 10);
-  
-  // Auto-close after 5 seconds
-  setTimeout(() => {
-    modal.classList.remove('show');
-    setTimeout(() => modal.remove(), 300);
-  }, 5000);
 }
 
 // ================================================
-// GUMROAD PAYMENT HANDLER
+// PROCEED TO DOWNLOAD
 // ================================================
-function initiateGumroadPayment() {
-  window.open(GUMROAD_URL, '_blank', 'noopener,noreferrer');
+function proceedToDownload() {
+  window.location.href = RAZORPAY_CONFIG.successUrl;
 }
 
 // ================================================
-// UNIFIED PAYMENT BUTTON HANDLER
+// BUTTON CLICK HANDLERS
 // ================================================
-function handleGetProClick(event) {
-  event.preventDefault();
-  
+function handleGetProClick() {
   if (isIndianUser) {
-    // Indian user: Show Razorpay
     initiateRazorpayPayment();
   } else {
-    // International user: Redirect to Gumroad
-    initiateGumroadPayment();
+    // Redirect to Gumroad for international users
+    window.open('https://mukeshfx.gumroad.com/l/Autocaptionspro', '_blank');
   }
-}
-
-// ================================================
-// INITIALIZE PAYMENT HANDLERS
-// ================================================
-function initializePaymentHandlers() {
-  // Get all "Get Pro" buttons
-  const buttons = [
-    document.getElementById('getProBtn'),
-    document.getElementById('upgradeProBtn'),
-    document.getElementById('finalCtaBtn')
-  ];
-  
-  buttons.forEach(button => {
-    if (button) {
-      button.addEventListener('click', handleGetProClick);
-    }
-  });
-  
-  console.log('Payment handlers initialized');
 }
 
 // ================================================
 // INITIALIZE ON PAGE LOAD
 // ================================================
 document.addEventListener('DOMContentLoaded', function() {
-  // Detect user location first
+  // Detect user location
   detectUserLocation();
   
-  // Initialize payment button handlers
-  initializePaymentHandlers();
+  // Attach click handlers to all "Get Pro" buttons
+  const getProButtons = [
+    document.getElementById('getProBtn'),
+    document.getElementById('upgradeProBtn'),
+    document.getElementById('finalCtaBtn')
+  ];
+  
+  getProButtons.forEach(button => {
+    if (button) {
+      button.addEventListener('click', handleGetProClick);
+    }
+  });
+  
+  console.log('💳 Payment system initialized');
+  console.log('🔧 Razorpay Key:', RAZORPAY_CONFIG.keyId);
+  console.log('💰 Amount:', RAZORPAY_CONFIG.amount, 'paise (₹' + (RAZORPAY_CONFIG.amount/100) + ')');
 });
 
 // ================================================
-// CSS STYLES FOR PAYMENT MODALS
+// MODAL STYLES (injected dynamically)
 // ================================================
-const paymentStyles = document.createElement('style');
-paymentStyles.textContent = `
+const style = document.createElement('style');
+style.textContent = `
   .payment-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10000;
     opacity: 0;
     transition: opacity 0.3s ease;
-    overflow-y: auto;
     padding: 20px;
+    backdrop-filter: blur(5px);
   }
-  
-  .payment-modal-overlay.show {
-    opacity: 1;
-  }
-  
+
   .payment-modal {
     background: white;
     border-radius: 20px;
     padding: 40px;
-    max-width: 550px;
+    max-width: 500px;
     width: 100%;
-    text-align: center;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    transform: scale(0.9);
+    transform: translateY(30px) scale(0.9);
     transition: transform 0.3s ease;
     max-height: 90vh;
     overflow-y: auto;
   }
-  
-  .payment-modal.license-modal {
-    max-width: 600px;
-  }
-  
-  .payment-modal-overlay.show .payment-modal {
-    transform: scale(1);
-  }
-  
-  .payment-modal-icon {
-    margin: 0 auto 20px;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: scaleIn 0.5s ease-out;
-  }
-  
+
   .payment-modal-icon.success {
-    background: rgba(0, 216, 138, 0.1);
+    text-align: center;
+    animation: successPulse 0.6s ease;
   }
-  
-  .payment-modal-icon.failure {
-    background: rgba(255, 107, 107, 0.1);
+
+  @keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
   }
-  
-  .payment-modal h2 {
-    font-size: 28px;
-    font-weight: 800;
-  }
-  
-  .payment-modal p {
+
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
     font-size: 16px;
-    line-height: 1.6;
-  }
-  
-  /* License Key Input Styling */
-  #licenseKeyDisplay {
-    user-select: all;
-    -webkit-user-select: all;
-    -moz-user-select: all;
-  }
-  
-  #licenseKeyDisplay:focus {
-    outline: 2px solid #667eea;
-    outline-offset: 2px;
-  }
-  
-  /* Button Hover Effects */
-  .payment-modal button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 94, 234, 0.3);
+    font-weight: 600;
+    cursor: pointer;
     transition: all 0.3s ease;
   }
-  
-  .payment-modal button:active {
-    transform: translateY(0);
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
   }
-  
-  /* Pulse Animation for License Section */
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-  }
-  
-  @keyframes scaleIn {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  
-  /* Details/Summary Styling */
-  details summary {
-    transition: color 0.3s ease;
-  }
-  
-  details[open] summary {
-    color: #667eea;
-  }
-  
-  details summary:hover {
-    color: #667eea;
-  }
-  
-  /* Scrollbar Styling for Modal */
-  .payment-modal::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .payment-modal::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-  
-  .payment-modal::-webkit-scrollbar-thumb {
-    background: #667eea;
-    border-radius: 10px;
-  }
-  
-  .payment-modal::-webkit-scrollbar-thumb:hover {
-    background: #5a4bd1;
-  }
-  
-  /* Mobile Responsive */
+
   @media (max-width: 768px) {
     .payment-modal {
       padding: 30px 20px;
-      max-height: 85vh;
-    }
-    
-    .payment-modal h2 {
-      font-size: 24px;
-    }
-    
-    .payment-modal-overlay {
-      padding: 10px;
-    }
-    
-    #licenseKeyDisplay {
-      font-size: 14px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .payment-modal {
-      padding: 25px 15px;
-    }
-    
-    #licenseKeyDisplay {
-      font-size: 12px;
+      max-height: 95vh;
     }
   }
 `;
-document.head.appendChild(paymentStyles);
+document.head.appendChild(style);
