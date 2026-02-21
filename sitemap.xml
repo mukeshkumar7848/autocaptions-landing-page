@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
-  <!-- Homepage -->
+
+  <!-- Homepage — canonical: https://mukeshfx.com/ -->
   <url>
     <loc>https://mukeshfx.com/</loc>
     <lastmod>2026-02-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-  
-  <!-- Get Pro Page (clean URL) -->
+
+  <!-- Get Pro — canonical: https://mukeshfx.com/getpro -->
   <url>
     <loc>https://mukeshfx.com/getpro</loc>
     <lastmod>2026-02-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
-  
-  <!-- Privacy Policy -->
+
+  <!-- Privacy Policy — canonical: https://mukeshfx.com/privacy -->
   <url>
     <loc>https://mukeshfx.com/privacy</loc>
     <lastmod>2026-02-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
-  
-  <!-- Terms of Service -->
+
+  <!-- Terms of Service — canonical: https://mukeshfx.com/terms -->
   <url>
     <loc>https://mukeshfx.com/terms</loc>
     <lastmod>2026-02-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
-  
+
 </urlset>
 

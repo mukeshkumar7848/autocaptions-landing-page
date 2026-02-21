@@ -2,8 +2,23 @@
 
 User-agent: *
 Allow: /
+
+# Block internal / test / admin pages from crawling
 Disallow: /admin
 Disallow: /admin.html
+Disallow: /test-geolocation.html
+Disallow: /test-payment.html
+Disallow: /test-payment-simple.html
+Disallow: /test-razorpay.sh
+Disallow: /webhook-handler.js
+Disallow: /payment-old-backup.js
+Disallow: /404.html
+
+# Block .html duplicates — canonical clean URLs are used instead
+Disallow: /index.html
+Disallow: /getpro.html
+Disallow: /privacy.html
+Disallow: /terms.html
 
 # Sitemaps
 Sitemap: https://mukeshfx.com/sitemap.xml
