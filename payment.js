@@ -16,6 +16,15 @@ function getAdminPrices() {
   return { usd: 49, inr: 999 };
 }
 
+// Load admin-configurable settings (download link, etc.) from localStorage
+function getAdminSettings() {
+  try {
+    const saved = localStorage.getItem('acp_admin_settings');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return { downloadUrl: 'https://mukeshfx.com' }; // default download link
+}
+
 const RAZORPAY_CONFIG = {
   keyId: null, // Will be fetched from server
   get amount() { return getAdminPrices().inr * 100; }, // paise
@@ -454,93 +463,211 @@ function handlePaymentFailure(response) {
 function showPaymentSuccessModal(paymentData) {
   // Remove existing modal if any
   const existingModal = document.getElementById('licenseModal');
-  if (existingModal) {
-    existingModal.remove();
+  if (existingModal) existingModal.remove();
+
+  // Inject modal styles once
+  if (!document.getElementById('licenseModalStyles')) {
+    const style = document.createElement('style');
+    style.id = 'licenseModalStyles';
+    style.textContent = `
+      #licenseModal {
+        position: fixed; inset: 0; z-index: 99999;
+        background: rgba(10,10,26,0.75);
+        backdrop-filter: blur(6px);
+        display: flex; align-items: center; justify-content: center;
+        padding: 16px;
+        animation: lmFadeIn .22s ease;
+      }
+      @keyframes lmFadeIn { from { opacity:0 } to { opacity:1 } }
+      @keyframes lmSlideUp { from { opacity:0; transform:translateY(24px) scale(.96) } to { opacity:1; transform:translateY(0) scale(1) } }
+
+      .lm-card {
+        background: #fff;
+        border-radius: 20px;
+        width: 100%; max-width: 460px;
+        box-shadow: 0 32px 80px rgba(0,0,0,.22);
+        animation: lmSlideUp .28s cubic-bezier(.16,1,.3,1);
+        overflow: hidden;
+      }
+
+      /* ── Top success banner ── */
+      .lm-banner {
+        background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+        padding: 22px 24px 18px;
+        display: flex; align-items: center; gap: 14px;
+      }
+      .lm-check {
+        width: 44px; height: 44px; flex-shrink: 0;
+        background: rgba(255,255,255,.18);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      }
+      .lm-banner h2 {
+        margin: 0; font-size: 18px; font-weight: 700; color: #fff; line-height: 1.25;
+      }
+      .lm-banner p {
+        margin: 2px 0 0; font-size: 12.5px; color: rgba(255,255,255,.78);
+      }
+
+      /* ── Body ── */
+      .lm-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+      /* license key box */
+      .lm-key-box {
+        background: linear-gradient(135deg,#667eea,#764ba2);
+        border-radius: 14px; padding: 14px 16px;
+      }
+      .lm-key-label {
+        font-size: 11.5px; color: rgba(255,255,255,.8); font-weight: 600;
+        text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px;
+      }
+      .lm-key-input-wrap {
+        background: rgba(255,255,255,.96);
+        border-radius: 9px; padding: 10px 12px; margin-bottom: 10px;
+        cursor: pointer;
+      }
+      .lm-key-input {
+        width: 100%; font-family: 'Courier New', monospace;
+        font-size: 13.5px; font-weight: 700; text-align: center;
+        color: #667eea; letter-spacing: 1.5px;
+        background: transparent; border: none; outline: none;
+        cursor: pointer;
+      }
+      .lm-key-actions { display: flex; gap: 8px; }
+      .lm-btn-copy, .lm-btn-dl {
+        flex: 1; padding: 9px 0; border-radius: 8px;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        border: none; transition: all .15s;
+      }
+      .lm-btn-copy {
+        background: #fff; color: #667eea;
+      }
+      .lm-btn-copy:hover { background: #f0f0fb; }
+      .lm-btn-dl {
+        background: rgba(255,255,255,.18); color: #fff;
+        border: 1.5px solid rgba(255,255,255,.6);
+      }
+      .lm-btn-dl:hover { background: rgba(255,255,255,.28); }
+
+      /* info rows */
+      .lm-info {
+        background: #f7f8fc; border-radius: 12px; padding: 11px 14px;
+        font-size: 12.5px; display: flex; flex-direction: column; gap: 5px;
+      }
+      .lm-info-row { display: flex; justify-content: space-between; align-items: center; }
+      .lm-info-label { color: #888; }
+      .lm-info-val { color: #222; font-family: monospace; font-size: 11.5px; font-weight: 600; }
+
+      /* email notice */
+      .lm-email-notice {
+        background: #fffbeb; border: 1px solid #fde68a;
+        border-radius: 10px; padding: 10px 13px;
+        font-size: 12px; color: #92400e; line-height: 1.5;
+        display: flex; gap: 8px; align-items: flex-start;
+      }
+
+      /* steps */
+      .lm-steps {
+        background: #eff6ff; border-radius: 12px; padding: 11px 14px;
+      }
+      .lm-steps-title {
+        font-size: 12px; font-weight: 700; color: #1d4ed8;
+        margin-bottom: 7px; text-transform: uppercase; letter-spacing: .5px;
+      }
+      .lm-steps ol {
+        margin: 0; padding-left: 16px;
+        font-size: 12px; color: #1e40af; line-height: 1.7;
+      }
+
+      /* CTA */
+      .lm-cta {
+        background: linear-gradient(135deg,#667eea,#764ba2);
+        color: #fff; border: none; border-radius: 12px;
+        padding: 13px; width: 100%; font-size: 15px; font-weight: 700;
+        cursor: pointer; transition: opacity .15s; letter-spacing: .3px;
+      }
+      .lm-cta:hover { opacity: .9; }
+
+      .lm-footer {
+        text-align: center; font-size: 11px; color: #aaa; padding-bottom: 4px;
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   const modal = document.createElement('div');
-  modal.className = 'payment-modal-overlay';
   modal.id = 'licenseModal';
   modal.innerHTML = `
-    <div class="payment-modal license-modal">
-      <div class="payment-modal-icon success">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00D88A" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M8 12l3 3 5-5"/>
-        </svg>
-      </div>
-      <h2 style="color: #0A0A1A; margin: 20px 0 10px;">Payment Successful! 🎉</h2>
-      <p style="color: #666; margin-bottom: 20px;">Thank you for upgrading to Auto Captions Generator Pro!</p>
-      
-      <!-- License Key Section -->
-      <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px; border-radius: 12px; margin: 20px 0;">
-        <p style="color: white; font-size: 14px; margin-bottom: 10px; font-weight: 600;">🔑 Your License Key</p>
-        <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-          <input type="text" id="licenseKeyDisplay" value="${paymentData.licenseKey}" 
-                 readonly 
-                 style="width: 100%; font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold; text-align: center; background: transparent; border: none; color: #667eea; letter-spacing: 1px;" 
-                 onclick="this.select()">
+    <div class="lm-card">
+
+      <!-- Banner -->
+      <div class="lm-banner">
+        <div class="lm-check">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/>
+          </svg>
         </div>
-        <div style="display: flex; gap: 10px;">
-          <button onclick="copyLicenseKey('${paymentData.licenseKey}')" 
-                  style="flex: 1; background: white; color: #667eea; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">
-            📋 Copy Key
-          </button>
-          <button onclick="downloadLicenseKey('${paymentData.licenseKey}', '${paymentData.paymentId}')" 
-                  style="flex: 1; background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">
-            💾 Download
-          </button>
+        <div>
+          <h2>Payment Successful! 🎉</h2>
+          <p>Thank you for upgrading to Auto Captions Generator Pro</p>
         </div>
       </div>
 
-      <!-- Email Notification -->
-      <div style="background: #FFF3CD; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFC107;">
-        <p style="color: #856404; font-size: 14px; margin: 0;">
-          📧 A copy has been sent to your email address.<br>
-          <small style="opacity: 0.8;">Check your inbox (and spam folder) for license details.</small>
-        </p>
-      </div>
-      
-      <!-- Payment Details -->
-      <div style="background: #F8F9FA; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 13px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: #666;">Payment ID:</span>
-          <span style="color: #0A0A1A; font-family: monospace; font-size: 12px;">${paymentData.paymentId}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="color: #666;">Order ID:</span>
-          <span style="color: #0A0A1A; font-family: monospace; font-size: 12px;">${paymentData.orderId}</span>
-        </div>
-      </div>
+      <!-- Body -->
+      <div class="lm-body">
 
-      <!-- Instructions -->
-      <div style="background: #E8F4FD; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196F3;">
-        <p style="color: #0D47A1; font-size: 14px; font-weight: 600; margin-bottom: 8px;">📝 How to Activate:</p>
-        <ol style="color: #1565C0; font-size: 13px; margin: 0; padding-left: 20px; line-height: 1.8;">
-          <li>Open Adobe After Effects</li>
-          <li>Go to Window → Extensions → Auto Captions Generator Pro</li>
-          <li>Click "Activate License"</li>
-          <li>Paste your license key and click "Activate"</li>
-        </ol>
+        <!-- License key -->
+        <div class="lm-key-box">
+          <div class="lm-key-label">🔑 Your License Key</div>
+          <div class="lm-key-input-wrap" onclick="document.getElementById('licenseKeyDisplay').select()">
+            <input type="text" id="licenseKeyDisplay" value="${paymentData.licenseKey}"
+                   readonly class="lm-key-input">
+          </div>
+          <div class="lm-key-actions">
+            <button class="lm-btn-copy" id="lmCopyBtn" onclick="copyLicenseKey('${paymentData.licenseKey}')">📋 Copy Key</button>
+            <button class="lm-btn-dl" id="lmDlBtn" onclick="downloadLicenseKey('${paymentData.licenseKey}', '${paymentData.paymentId}')">💾 Download</button>
+          </div>
+        </div>
+
+        <!-- Payment info + email side by side -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="lm-info">
+            <div class="lm-info-row">
+              <span class="lm-info-label">Payment ID</span>
+            </div>
+            <div class="lm-info-val" style="word-break:break-all;">${paymentData.paymentId}</div>
+            <div style="margin-top:6px" class="lm-info-row">
+              <span class="lm-info-label">Order ID</span>
+            </div>
+            <div class="lm-info-val" style="word-break:break-all;">${paymentData.orderId}</div>
+          </div>
+          <div class="lm-email-notice">
+            <span style="font-size:16px;line-height:1">📧</span>
+            <span>License key sent to your email. Check inbox &amp; spam.</span>
+          </div>
+        </div>
+
+        <!-- How to activate -->
+        <div class="lm-steps">
+          <div class="lm-steps-title">📝 How to Activate</div>
+          <ol>
+            <li>Open Adobe After Effects</li>
+            <li>Window → Extensions → Auto Captions Generator Pro</li>
+            <li>Click <strong>"Activate License"</strong> &amp; paste your key</li>
+          </ol>
+        </div>
+
+        <!-- CTA -->
+        <button class="lm-cta" onclick="proceedToDownload()">
+          ⬇️ Continue to Download →
+        </button>
+
+        <div class="lm-footer">Need help? Contact support with your Payment ID</div>
+
       </div>
-      
-      <button onclick="proceedToDownload()" class="btn-primary" style="width: 100%; margin-top: 10px;">
-        Continue to Download →
-      </button>
-      
-      <p style="margin-top: 15px; font-size: 12px; color: #999; text-align: center;">
-        Need help? Contact support with your Payment ID
-      </p>
     </div>
   `;
-  
+
   document.body.appendChild(modal);
-  
-  // Animate in
-  setTimeout(() => {
-    modal.style.opacity = '1';
-    modal.querySelector('.payment-modal').style.transform = 'translateY(0) scale(1)';
-  }, 10);
 }
 
 // ================================================
@@ -573,12 +700,12 @@ function fallbackCopy(licenseKey) {
 }
 
 function showCopyFeedback(message) {
-  const button = event.target;
+  const button = document.getElementById('lmCopyBtn');
+  if (!button) return;
   const originalText = button.textContent;
   button.textContent = message;
   button.style.background = '#00D88A';
   button.style.color = 'white';
-  
   setTimeout(() => {
     button.textContent = originalText;
     button.style.background = 'white';
@@ -628,24 +755,27 @@ Thank you for choosing Auto Captions Generator Pro! 🎉
   window.URL.revokeObjectURL(url);
   
   // Visual feedback
-  const button = event.target;
-  const originalText = button.textContent;
-  button.textContent = '✓ Downloaded';
-  button.style.background = '#00D88A';
-  button.style.borderColor = '#00D88A';
-  
-  setTimeout(() => {
-    button.textContent = originalText;
-    button.style.background = 'rgba(255,255,255,0.2)';
-    button.style.borderColor = 'white';
-  }, 2000);
+  const button = document.getElementById('lmDlBtn');
+  if (button) {
+    const originalText = button.textContent;
+    button.textContent = '✓ Downloaded';
+    button.style.background = '#00D88A';
+    button.style.borderColor = '#00D88A';
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.style.background = 'rgba(255,255,255,0.18)';
+      button.style.borderColor = 'rgba(255,255,255,0.6)';
+    }, 2000);
+  }
 }
 
 // ================================================
 // PROCEED TO DOWNLOAD
 // ================================================
 function proceedToDownload() {
-  window.location.href = RAZORPAY_CONFIG.successUrl;
+  const settings = getAdminSettings();
+  const url = (settings.downloadUrl && settings.downloadUrl.trim()) || RAZORPAY_CONFIG.successUrl;
+  window.location.href = url;
 }
 
 // ================================================

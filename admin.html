@@ -726,6 +726,35 @@
             </div>
           </div>
         </div>
+
+        <!-- Download Link -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">⬇️ Post-Payment Download Link <span style="font-size:11px; background:rgba(102,126,234,.15); color:#667eea; border-radius:6px; padding:2px 8px; margin-left:6px; font-weight:600;">Razorpay Only</span></div>
+              <div class="panel-desc">After a successful Razorpay payment, users click "Continue to Download" — this is where they land.</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <label style="font-size:13px; color:var(--text-muted); font-weight:600;">Download / Redirect URL</label>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="url" id="input-download-url"
+                  placeholder="https://your-download-link.com"
+                  style="flex:1; padding:11px 14px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg-card); color:var(--text); font-size:14px; outline:none; transition:border .15s;"
+                  onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='var(--border)'">
+                <button class="btn btn-primary" onclick="saveDownloadUrl()" style="white-space:nowrap;">
+                  💾 Save Link
+                </button>
+              </div>
+              <div id="dl-url-status" style="font-size:12px; color:var(--text-muted);"></div>
+              <div style="background:rgba(102,126,234,.07); border:1px solid rgba(102,126,234,.18); border-radius:10px; padding:12px 14px; font-size:12.5px; color:rgba(102,126,234,.9); line-height:1.6;">
+                💡 <strong>Tip:</strong> Use a Gumroad product link, a Google Drive download, a Dropbox link, or any direct download URL. This only affects Razorpay (India) payments — Gumroad handles its own redirect.
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- ── CHANGELOG ── -->
@@ -841,6 +870,33 @@ function resetDefaults() {
   document.getElementById('input-inr').value = 999;
   document.getElementById('input-usd').value = 49;
   savePrices();
+}
+
+// ─────────────────────────────────────────────
+// DOWNLOAD LINK
+// ─────────────────────────────────────────────
+function getSettings() {
+  try { return JSON.parse(localStorage.getItem('acp_admin_settings') || '{}'); } catch(e) { return {}; }
+}
+
+function saveDownloadUrl() {
+  const url = document.getElementById('input-download-url').value.trim();
+  if (!url) { showToast('❌ Please enter a valid URL.', 'error'); return; }
+  const settings = getSettings();
+  settings.downloadUrl = url;
+  settings.updatedAt = new Date().toLocaleString('en-IN');
+  localStorage.setItem('acp_admin_settings', JSON.stringify(settings));
+  document.getElementById('dl-url-status').textContent = '✅ Saved at ' + settings.updatedAt;
+  showToast('✅ Download link saved!', 'success');
+}
+
+function loadDownloadUrl() {
+  const settings = getSettings();
+  const input = document.getElementById('input-download-url');
+  if (input && settings.downloadUrl) {
+    input.value = settings.downloadUrl;
+    document.getElementById('dl-url-status').textContent = settings.updatedAt ? 'Last saved: ' + settings.updatedAt : '';
+  }
 }
 
 function setInrPreset(v) {
@@ -966,6 +1022,7 @@ function showToast(msg, type = 'success') {
 // ─────────────────────────────────────────────
 function initAdmin() {
   refreshAll();
+  loadDownloadUrl();
 
   // Live update hints as user types
   const inputInr = document.getElementById('input-inr');
