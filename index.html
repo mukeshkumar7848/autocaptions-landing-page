@@ -119,8 +119,8 @@
             Download Free Version
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </a>
-          <a href="/getpro" class="btn btn-secondary btn-large">
-            Upgrade to Pro — $49
+          <a href="/getpro" class="btn btn-secondary btn-large" id="hero-pro-btn">
+            Upgrade to Pro — <span id="hero-pro-price">$49</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -291,7 +291,7 @@
           </div>
           <div class="comparison-pro-col">
             <span class="comparison-plan-name">Pro</span>
-            <span class="comparison-plan-price">$49</span>
+            <span class="comparison-plan-price" id="cmp-pro-price">$49</span>
           </div>
         </div>
         <div class="comparison-row">
@@ -350,7 +350,7 @@
             <a href="https://mukeshfx.gumroad.com/l/autocaptions" class="btn btn-secondary" target="_blank" rel="noopener">Download Free</a>
           </div>
           <div class="comparison-pro-col">
-            <a href="/getpro" class="btn btn-primary">Get Pro — $49</a>
+            <a href="/getpro" class="btn btn-primary" id="cmp-pro-btn">Get Pro — <span id="cmp-pro-btn-price">$49</span></a>
           </div>
         </div>
       </div>
@@ -623,11 +623,11 @@
           <div class="pricing-badge">Most Popular</div>
           <div class="pricing-header">
             <h3>Pro</h3>
-            <div class="pricing-price">
-              <span class="currency">$</span>
-              <span class="amount">49</span>
+            <div class="pricing-price" id="pro-price-block">
+              <span class="currency" id="pro-currency">$</span>
+              <span class="amount" id="pro-amount">49</span>
             </div>
-            <p class="pricing-period">One-time payment</p>
+            <p class="pricing-period" id="pro-price-period">One-time payment</p>
           </div>
           
           <ul class="pricing-features">
@@ -665,8 +665,8 @@
             </li>
           </ul>
           
-          <a href="/getpro" class="btn btn-primary btn-large">
-            Get Pro — $49
+          <a href="/getpro" class="btn btn-primary btn-large" id="pricing-pro-btn">
+            Get Pro — <span id="pricing-pro-btn-price">$49</span>
           </a>
           
           <p class="pricing-note">Instant download • Lifetime access • No subscription</p>
@@ -847,5 +847,133 @@
   <!-- Scripts -->
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script src="script.js"></script>
+
+  <!-- ─── Dynamic Pricing (India ₹ / International $) ─── -->
+  <script>
+  (function () {
+    /* ── read admin-set prices (same store as payment.js) ── */
+    function getPrices() {
+      try {
+        var s = localStorage.getItem('acp_admin_prices');
+        if (s) return JSON.parse(s);
+      } catch (e) {}
+      return { usd: 49, inr: 999 };
+    }
+
+    /* ── apply prices to every spot on the page ── */
+    function applyPrices(isIndia) {
+      var p = getPrices();
+      var label = isIndia ? ('₹' + p.inr.toLocaleString('en-IN')) : ('$' + p.usd);
+      var cur   = isIndia ? '₹' : '$';
+      var amt   = isIndia ? p.inr.toLocaleString('en-IN') : String(p.usd);
+
+      // Hero button
+      var heroPP = document.getElementById('hero-pro-price');
+      if (heroPP) heroPP.textContent = label;
+
+      // Comparison table header price
+      var cmpP = document.getElementById('cmp-pro-price');
+      if (cmpP) cmpP.textContent = label;
+
+      // Comparison table CTA
+      var cmpBP = document.getElementById('cmp-pro-btn-price');
+      if (cmpBP) cmpBP.textContent = label;
+
+      // Pricing card big number
+      var proCur = document.getElementById('pro-currency');
+      var proAmt = document.getElementById('pro-amount');
+      if (proCur) proCur.textContent = cur;
+      if (proAmt) proAmt.textContent = amt;
+
+      // Pricing card period note
+      var period = document.getElementById('pro-price-period');
+      if (period) period.textContent = isIndia
+        ? 'One-time • 🇮🇳 India Special Price'
+        : 'One-time payment';
+
+      // Pricing card CTA button
+      var pricingBP = document.getElementById('pricing-pro-btn-price');
+      if (pricingBP) pricingBP.textContent = label;
+
+      // Fire the special shake animation on the big price block
+      triggerPriceShake();
+    }
+
+    /* ── shake + glow animation on the Pro price ── */
+    function triggerPriceShake() {
+      var block = document.getElementById('pro-price-block');
+      if (!block) return;
+      block.classList.remove('price-shake');
+      // force reflow so re-adding works
+      void block.offsetWidth;
+      block.classList.add('price-shake');
+    }
+
+    /* ── detect country ── */
+    function detectAndApply() {
+      fetch('https://ipapi.co/json/')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          applyPrices(d.country_code === 'IN');
+        })
+        .catch(function () {
+          // fallback
+          fetch('https://api.country.is/')
+            .then(function (r) { return r.json(); })
+            .then(function (d) { applyPrices(d.country === 'IN'); })
+            .catch(function () { applyPrices(false); });
+        });
+    }
+
+    // Run after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', detectAndApply);
+    } else {
+      detectAndApply();
+    }
+  })();
+  </script>
+
+  <style>
+  /* ── Special price shake + glow animation ── */
+  @keyframes priceShake {
+    0%   { transform: scale(1)    rotate(0deg);  }
+    10%  { transform: scale(1.08) rotate(-2deg); }
+    20%  { transform: scale(1.12) rotate(2deg);  }
+    30%  { transform: scale(1.10) rotate(-1.5deg);}
+    40%  { transform: scale(1.08) rotate(1.5deg); }
+    50%  { transform: scale(1.05) rotate(-1deg);  }
+    60%  { transform: scale(1.06) rotate(1deg);   }
+    70%  { transform: scale(1.03) rotate(-0.5deg);}
+    80%  { transform: scale(1.02) rotate(0.5deg); }
+    90%  { transform: scale(1.01) rotate(0deg);   }
+    100% { transform: scale(1)    rotate(0deg);   }
+  }
+
+  @keyframes priceGlow {
+    0%   { text-shadow: none; }
+    30%  { text-shadow: 0 0 24px rgba(102,126,234,0.9), 0 0 48px rgba(118,75,162,0.6); }
+    70%  { text-shadow: 0 0 16px rgba(102,126,234,0.6), 0 0 32px rgba(118,75,162,0.3); }
+    100% { text-shadow: none; }
+  }
+
+  #pro-price-block.price-shake {
+    animation:
+      priceShake 0.8s cubic-bezier(.36,.07,.19,.97) both,
+      priceGlow  1.2s ease both;
+    display: inline-block; /* needed for transform to apply */
+    transform-origin: center bottom;
+  }
+
+  /* subtle continuous pulse after shake settles */
+  #pro-price-block.price-shake .amount {
+    animation: subtlePulse 2.5s ease 1s infinite;
+  }
+
+  @keyframes subtlePulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.82; }
+  }
+  </style>
 </body>
 </html>
