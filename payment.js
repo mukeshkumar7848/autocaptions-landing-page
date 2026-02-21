@@ -1,5 +1,5 @@
 // ================================================
-// AUTO CAPTIONS PRO - PAYMENT SYSTEM
+// AUTO CAPTIONS GENERATOR PRO - PAYMENT SYSTEM
 // Razorpay Integration with Order Creation & Email
 // ================================================
 
@@ -20,7 +20,7 @@ const RAZORPAY_CONFIG = {
   keyId: null, // Will be fetched from server
   get amount() { return getAdminPrices().inr * 100; }, // paise
   currency: 'INR',
-  name: 'Auto Captions Pro',
+  name: 'Auto Captions Generator Pro',
   description: 'Lifetime Pro License',
   image: '../client/assets/logo.png',
   successUrl: 'https://www.instagram.com/mukeshfx',
@@ -274,7 +274,7 @@ async function initiateRazorpayPayment() {
         receipt: `receipt_${Date.now()}`,
         email: userEmail, // Send email so server can include it in order notes
         notes: {
-          product: 'Auto Captions Pro',
+          product: 'Auto Captions Generator Pro',
           type: 'lifetime_license'
         }
       })
@@ -470,7 +470,7 @@ function showPaymentSuccessModal(paymentData) {
         </svg>
       </div>
       <h2 style="color: #0A0A1A; margin: 20px 0 10px;">Payment Successful! 🎉</h2>
-      <p style="color: #666; margin-bottom: 20px;">Thank you for upgrading to Auto Captions Pro!</p>
+      <p style="color: #666; margin-bottom: 20px;">Thank you for upgrading to Auto Captions Generator Pro!</p>
       
       <!-- License Key Section -->
       <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px; border-radius: 12px; margin: 20px 0;">
@@ -518,7 +518,7 @@ function showPaymentSuccessModal(paymentData) {
         <p style="color: #0D47A1; font-size: 14px; font-weight: 600; margin-bottom: 8px;">📝 How to Activate:</p>
         <ol style="color: #1565C0; font-size: 13px; margin: 0; padding-left: 20px; line-height: 1.8;">
           <li>Open Adobe After Effects</li>
-          <li>Go to Window → Extensions → Auto Captions Pro</li>
+          <li>Go to Window → Extensions → Auto Captions Generator Pro</li>
           <li>Click "Activate License"</li>
           <li>Paste your license key and click "Activate"</li>
         </ol>
@@ -592,7 +592,7 @@ function showCopyFeedback(message) {
 function downloadLicenseKey(licenseKey, paymentId) {
   const content = `
 ╔══════════════════════════════════════════════╗
-║     AUTO CAPTIONS PRO - LICENSE KEY          ║
+║     AUTO CAPTIONS GENERATOR PRO - LICENSE KEY          ║
 ╚══════════════════════════════════════════════╝
 
 LICENSE KEY:
@@ -604,7 +604,7 @@ Date: ${new Date().toLocaleString()}
 
 ACTIVATION INSTRUCTIONS:
 1. Open Adobe After Effects
-2. Go to Window → Extensions → Auto Captions Pro
+2. Go to Window → Extensions → Auto Captions Generator Pro
 3. Click "Activate License"
 4. Paste your license key and click "Activate"
 
@@ -614,14 +614,14 @@ IMPORTANT NOTES:
 • For support, contact us with your Payment ID
 • Visit: https://mukeshfx.com for documentation
 
-Thank you for choosing Auto Captions Pro! 🎉
+Thank you for choosing Auto Captions Generator Pro! 🎉
 `;
 
   const blob = new Blob([content], { type: 'text/plain' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `AutoCaptions-Pro-License-${paymentId}.txt`;
+  a.download = `AutoCaptionsGenerator-Pro-License-${paymentId}.txt`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

@@ -1,4 +1,4 @@
-# Auto Captions Pro - Apache Configuration
+# Auto Captions Generator Pro - Apache Configuration
 
 # Custom 404 Error Page
 ErrorDocument 404 /404.html

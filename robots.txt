@@ -1,4 +1,4 @@
-# robots.txt for Auto Captions Pro
+# robots.txt for Auto Captions Generator Pro
 
 User-agent: *
 Allow: /
