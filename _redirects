@@ -4,6 +4,7 @@
 /getpro              /getpro.html          200
 /privacy             /privacy.html         200
 /terms               /terms.html           200
+/admin               /admin.html           200
 
 # Custom 404 page
 /*    /404.html    404

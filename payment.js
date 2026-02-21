@@ -6,9 +6,19 @@
 // ================================================
 // CONFIGURATION
 // ================================================
+
+// Load admin-configurable prices from localStorage (set via admin.html)
+function getAdminPrices() {
+  try {
+    const saved = localStorage.getItem('acp_admin_prices');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return { usd: 49, inr: 999 };
+}
+
 const RAZORPAY_CONFIG = {
   keyId: null, // Will be fetched from server
-  amount: 999000, // Amount in paise (₹1 = 100 paise for testing)
+  get amount() { return getAdminPrices().inr * 100; }, // paise
   currency: 'INR',
   name: 'Auto Captions Pro',
   description: 'Lifetime Pro License',
@@ -157,52 +167,83 @@ async function detectUserLocation() {
 // UPDATE UI BASED ON LOCATION
 // ================================================
 function updatePaymentUI() {
-  const regionInfo = document.getElementById('paymentRegionInfo');
-  
-  if (!regionInfo) return;
-  
+  const prices = getAdminPrices();
+
+  // Update price amounts in DOM (in case admin changed them)
+  const inrEl = document.getElementById('inr-amount');
+  const usdEl = document.getElementById('usd-amount');
+  if (inrEl) inrEl.textContent = prices.inr.toLocaleString('en-IN');
+  if (usdEl) usdEl.textContent = prices.usd;
+
+  // Show correct price card & tab
+  const indiaCard  = document.getElementById('price-india');
+  const intlCard   = document.getElementById('price-intl');
+  const tabIndia   = document.getElementById('tab-india');
+  const tabIntl    = document.getElementById('tab-intl');
+
+  if (indiaCard && intlCard) {
+    if (isIndianUser) {
+      indiaCard.style.display = 'block';
+      intlCard.style.display  = 'none';
+      if (tabIndia) tabIndia.classList.add('active');
+      if (tabIntl)  tabIntl.classList.remove('active');
+    } else {
+      indiaCard.style.display = 'none';
+      intlCard.style.display  = 'block';
+      if (tabIntl)  tabIntl.classList.add('active');
+      if (tabIndia) tabIndia.classList.remove('active');
+    }
+  }
+
+  // Update CTA button text
+  const btnText      = document.getElementById('getProBtnText');
+  const finalBtnText = document.getElementById('finalCtaBtnText');
+  const upgradeBtn   = document.getElementById('upgradeProBtn');
+
   if (isIndianUser) {
-    regionInfo.innerHTML = `
-      <span style="color: #00D88A; font-weight: 600;">
-        🇮🇳 Indian users: Pay ₹999 via Razorpay
-      </span>
-      <br>
-      <span style="opacity: 0.7; font-size: 12px;">
-        Not in India? <a href="#" onclick="event.preventDefault(); window.switchToGumroad();" style="color: #667eea; text-decoration: underline; cursor: pointer;">Switch to International Payment ($49)</a>
-      </span>
-    `;
+    const label = `Get Pro — ₹${prices.inr.toLocaleString('en-IN')}`;
+    if (btnText)      btnText.textContent      = label;
+    if (finalBtnText) finalBtnText.textContent  = label + ' →';
+    if (upgradeBtn)   upgradeBtn.textContent    = label;
   } else {
-    regionInfo.innerHTML = `
-      <span style="color: #667eea; font-weight: 600;">
-        🌍 International users: Pay $49 via Gumroad
-      </span>
-      <br>
-      <span style="opacity: 0.7; font-size: 12px;">
-        From India? <a href="#" onclick="event.preventDefault(); window.switchToRazorpay();" style="color: #00D88A; text-decoration: underline; cursor: pointer;">Switch to INR Payment (₹999)</a>
-      </span>
-    `;
+    const label = `Get Pro — $${prices.usd}`;
+    if (btnText)      btnText.textContent      = label;
+    if (finalBtnText) finalBtnText.textContent  = label + ' →';
+    if (upgradeBtn)   upgradeBtn.textContent    = label;
+  }
+
+  // Legacy paymentRegionInfo support
+  const regionInfo = document.getElementById('paymentRegionInfo');
+  if (regionInfo && regionInfo.style.display !== 'none') {
+    regionInfo.innerHTML = isIndianUser
+      ? `<span style="color:#00D88A;font-weight:600;">🇮🇳 Indian price: ₹${prices.inr.toLocaleString('en-IN')} via Razorpay</span>`
+      : `<span style="color:#667eea;font-weight:600;">🌍 International price: $${prices.usd} via Gumroad</span>`;
   }
 }
 
 // ================================================
-// MANUAL PAYMENT METHOD SWITCHES
+// MANUAL REGION SWITCH (called from region tabs)
+// ================================================
+window.manualSwitchRegion = function(region) {
+  isIndianUser = (region === 'india');
+  userCountry  = isIndianUser ? 'IN' : 'INTL';
+  console.log('💱 Manually switched to:', region);
+  updatePaymentUI();
+};
+
+// ================================================
+// MANUAL PAYMENT METHOD SWITCHES (legacy)
 // ================================================
 window.switchToRazorpay = function() {
-  if (confirm('Switch to Razorpay payment (₹999 for Indian users)?')) {
-    isIndianUser = true;
-    userCountry = 'IN';
-    console.log('💱 Switched to Razorpay (India)');
-    updatePaymentUI();
-  }
+  isIndianUser = true;
+  userCountry  = 'IN';
+  updatePaymentUI();
 };
 
 window.switchToGumroad = function() {
-  if (confirm('Switch to Gumroad payment ($49 for international users)?')) {
-    isIndianUser = false;
-    userCountry = 'INTL';
-    console.log('💱 Switched to Gumroad (International)');
-    updatePaymentUI();
-  }
+  isIndianUser = false;
+  userCountry  = 'INTL';
+  updatePaymentUI();
 };
 
 // ================================================
@@ -228,7 +269,7 @@ async function initiateRazorpayPayment() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        amount: RAZORPAY_CONFIG.amount,
+        amount: RAZORPAY_CONFIG.amount,  // dynamic from admin prices
         currency: RAZORPAY_CONFIG.currency,
         receipt: `receipt_${Date.now()}`,
         email: userEmail, // Send email so server can include it in order notes

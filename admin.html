@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — Auto Captions Pro</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5a6fd6;
+      --accent: #764ba2;
+      --success: #00D88A;
+      --warning: #FFC107;
+      --danger: #FF4757;
+      --bg: #0f0f1a;
+      --card: #1a1a2e;
+      --card2: #16213e;
+      --border: rgba(255,255,255,0.08);
+      --text: #f0f0f0;
+      --text-muted: rgba(255,255,255,0.5);
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── LOGIN SCREEN ─── */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 24px;
+    }
+
+    .login-card h1 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .login-card p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 15px;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      background: rgba(102,126,234,0.08);
+    }
+
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-login:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .login-error {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+      padding: 10px;
+      background: rgba(255,71,87,0.1);
+      border-radius: 8px;
+    }
+
+    /* ─── ADMIN PANEL ─── */
+    #adminPanel { display: none; }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px 28px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .sidebar-brand-text { font-size: 15px; font-weight: 700; }
+    .sidebar-brand-sub  { font-size: 11px; color: var(--text-muted); }
+
+    .nav-section {
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .nav-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0 12px;
+      margin-bottom: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover     { background: rgba(255,255,255,0.05); color: var(--text); }
+    .nav-item.active    { background: rgba(102,126,234,0.15); color: var(--primary); }
+    .nav-item .nav-icon { font-size: 16px; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 20px 24px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Main content */
+    .main-content {
+      margin-left: 240px;
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .page-title  { font-size: 26px; font-weight: 800; }
+    .page-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Stat cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .stat-value { font-size: 32px; font-weight: 900; margin-bottom: 4px; }
+    .stat-change { font-size: 12px; color: var(--success); }
+
+    /* Panels */
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .panel-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title { font-size: 16px; font-weight: 700; }
+    .panel-desc  { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .panel-body  { padding: 24px; }
+
+    /* Price inputs */
+    .price-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .price-card {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .price-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .price-flag { font-size: 28px; }
+
+    .price-card-title { font-size: 16px; font-weight: 700; }
+    .price-card-sub   { font-size: 12px; color: var(--text-muted); }
+
+    .price-input-wrap {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .price-input-wrap .currency-symbol {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .price-input-wrap input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px 14px 42px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .price-input-wrap input:focus { border-color: var(--primary); }
+
+    .price-hint { font-size: 12px; color: var(--text-muted); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+    }
+
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .btn-success { background: var(--success); color: #0a0a1a; }
+    .btn-danger  { background: var(--danger);  color: white; }
+    .btn-ghost   { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+
+    .btn-lg { padding: 14px 28px; font-size: 16px; border-radius: 12px; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: #1e1e3a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { border-color: var(--success); }
+    #toast.error   { border-color: var(--danger); }
+
+    /* Section page visibility */
+    .section-page { display: none; }
+    .section-page.active { display: block; }
+
+    /* Live Preview */
+    .preview-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      color: white;
+    }
+
+    .preview-price { font-size: 52px; font-weight: 900; margin: 8px 0; }
+    .preview-sub   { font-size: 14px; opacity: 0.85; margin-bottom: 12px; }
+    .preview-badge {
+      display: inline-block;
+      background: rgba(0,210,255,0.9);
+      color: #0a0a1a;
+      padding: 5px 14px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* Region switcher preview */
+    .preview-switcher {
+      display: flex;
+      gap: 0;
+      margin: 16px auto 0;
+      background: rgba(0,0,0,0.25);
+      border-radius: 50px;
+      padding: 4px;
+      max-width: 280px;
+    }
+
+    .preview-tab {
+      flex: 1;
+      padding: 8px 14px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: default;
+    }
+
+    .preview-tab.active { background: white; color: #667eea; }
+    .preview-tab:not(.active) { background: transparent; color: rgba(255,255,255,0.6); }
+
+    /* Changelog table */
+    .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .table th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+    .table td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .table tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; }
+    .badge-inr { background: rgba(255,193,7,0.15); color: #FFC107; }
+    .badge-usd { background: rgba(102,126,234,0.15); color: #667eea; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 24px 16px; }
+      .price-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--               LOGIN SCREEN                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">⚙️</div>
+    <h1>Admin Panel</h1>
+    <p>Auto Captions Pro — Manage prices & settings</p>
+
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Sign In →</button>
+    <div class="login-error" id="loginError">Incorrect username or password.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--               ADMIN PANEL                   -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="adminPanel">
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">⚙️</div>
+        <div>
+          <div class="sidebar-brand-text">Admin Panel</div>
+          <div class="sidebar-brand-sub">Auto Captions Pro</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <button class="nav-item active" onclick="showPage('dashboard', this)">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-item" onclick="showPage('pricing', this)">
+          <span class="nav-icon">💰</span> Pricing
+        </button>
+        <button class="nav-item" onclick="showPage('changelog', this)">
+          <span class="nav-icon">📋</span> Change Log
+        </button>
+      </div>
+
+      <div class="nav-section" style="margin-top: 12px;">
+        <div class="nav-section-title">Links</div>
+        <button class="nav-item" onclick="window.open('/getpro','_blank')">
+          <span class="nav-icon">🔗</span> View Get Pro Page
+        </button>
+        <button class="nav-item" onclick="window.open('/','_blank')">
+          <span class="nav-icon">🌐</span> View Homepage
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="nav-item" onclick="doLogout()" style="color: var(--danger);">
+          <span class="nav-icon">🚪</span> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="section-page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Dashboard</div>
+            <div class="page-subtitle">Welcome back, Mukesh 👋</div>
+          </div>
+          <button class="btn btn-ghost" onclick="showPage('pricing', document.querySelector('.nav-item:nth-child(2)'))">Manage Prices →</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">INR Price</div>
+            <div class="stat-value" id="dash-inr" style="color: var(--warning);">₹999</div>
+            <div class="stat-change">India region</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">USD Price</div>
+            <div class="stat-value" id="dash-usd" style="color: var(--primary);">$49</div>
+            <div class="stat-change">International</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">INR (paise)</div>
+            <div class="stat-value" id="dash-paise" style="font-size: 22px; padding-top: 8px;">99,900</div>
+            <div class="stat-change">Sent to Razorpay API</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Last Updated</div>
+            <div class="stat-value" id="dash-updated" style="font-size: 16px; padding-top: 10px;">—</div>
+            <div class="stat-change">Price change</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">🔴 Live Preview — Get Pro Page</div>
+              <div class="panel-desc">This is how the price card looks to visitors right now</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 10px;">🇮🇳 India View</div>
+                <div class="preview-box">
+                  <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">One-time payment</div>
+                  <div class="preview-price" id="prev-inr">₹999</div>
+                  <div class="preview-sub">Lifetime access</div>
+                  <div class="preview-badge">🇮🇳 Special India Price</div>
+                  <div class="preview-switcher">
+                    <div class="preview-tab">🌍 International ($)</div>
+                    <div class="preview-tab active">🇮🇳 India (₹)</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 10px;">🌍 International View</div>
+                <div class="preview-box">
+                  <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">One-time payment</div>
+                  <div class="preview-price" id="prev-usd">$49</div>
+                  <div class="preview-sub">Lifetime access</div>
+                  <div class="preview-badge">🌍 International Price</div>
+                  <div class="preview-switcher">
+                    <div class="preview-tab active">🌍 International ($)</div>
+                    <div class="preview-tab">🇮🇳 India (₹)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PRICING ── -->
+      <div class="section-page" id="page-pricing">
+        <div class="page-header">
+          <div>
+            <div class="page-title">💰 Pricing Manager</div>
+            <div class="page-subtitle">Set prices displayed on the Get Pro page. Changes take effect immediately.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Edit Prices</div>
+              <div class="panel-desc">Prices are stored in browser localStorage and read by payment.js on every page load</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="price-grid">
+              <!-- INR Card -->
+              <div class="price-card">
+                <div class="price-card-header">
+                  <div class="price-flag">🇮🇳</div>
+                  <div>
+                    <div class="price-card-title">India Price (INR)</div>
+                    <div class="price-card-sub">Shown to users from India • Charged via Razorpay</div>
+                  </div>
+                </div>
+                <div class="price-input-wrap">
+                  <span class="currency-symbol">₹</span>
+                  <input type="number" id="input-inr" min="1" step="1" placeholder="999">
+                </div>
+                <div class="price-hint">Razorpay will receive: <strong id="hint-paise">99,900 paise</strong></div>
+                <div style="margin-top: 12px;">
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Quick presets:</div>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setInrPreset(499)">₹499</button>
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setInrPreset(799)">₹799</button>
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setInrPreset(999)">₹999</button>
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setInrPreset(1499)">₹1,499</button>
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setInrPreset(1999)">₹1,999</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- USD Card -->
+              <div class="price-card">
+                <div class="price-card-header">
+                  <div class="price-flag">🌍</div>
+                  <div>
+                    <div class="price-card-title">International Price (USD)</div>
+                    <div class="price-card-sub">Shown to non-India users • Charged via Gumroad</div>
+                  </div>
+                </div>
+                <div class="price-input-wrap">
+                  <span class="currency-symbol">$</span>
+                  <input type="number" id="input-usd" min="1" step="1" placeholder="49">
+                </div>
+                <div class="price-hint">Update Gumroad product price separately at <a href="https://app.gumroad.com" target="_blank" style="color: var(--primary);">app.gumroad.com</a></div>
+                <div style="margin-top: 12px;">
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Quick presets:</div>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setUsdPreset(29)">$29</button>
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setUsdPreset(39)">$39</button>
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setUsdPreset(49)">$49</button>
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setUsdPreset(59)">$59</button>
+                    <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" onclick="setUsdPreset(79)">$79</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save button -->
+            <div style="margin-top: 28px; display: flex; align-items: center; gap: 16px;">
+              <button class="btn btn-primary btn-lg" onclick="savePrices()">
+                💾 Save & Apply Changes
+              </button>
+              <button class="btn btn-ghost" onclick="resetDefaults()">
+                ↺ Reset to Defaults
+              </button>
+              <div id="save-status" style="font-size: 13px; color: var(--text-muted);"></div>
+            </div>
+
+            <!-- Warning note -->
+            <div style="margin-top: 20px; background: rgba(255,193,7,0.08); border: 1px solid rgba(255,193,7,0.2); border-radius: 10px; padding: 14px 16px; font-size: 13px; color: rgba(255,193,7,0.9);">
+              ⚠️ <strong>Note:</strong> Prices are stored in <em>this browser's</em> localStorage. To make them permanent for all users, update the default values in <code>payment.js</code> (<code>getAdminPrices()</code> function). The Gumroad price must also be updated manually in your Gumroad dashboard.
+            </div>
+          </div>
+        </div>
+
+        <!-- Live preview -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Live Preview</div>
+          </div>
+          <div class="panel-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 10px;">India</div>
+                <div class="preview-box">
+                  <div class="preview-price" id="pv2-inr">₹999</div>
+                  <div class="preview-sub">One-time • Lifetime access</div>
+                  <div class="preview-badge">🇮🇳 Special India Price</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 10px;">International</div>
+                <div class="preview-box">
+                  <div class="preview-price" id="pv2-usd">$49</div>
+                  <div class="preview-sub">One-time • Lifetime access</div>
+                  <div class="preview-badge">🌍 International Price</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CHANGELOG ── -->
+      <div class="section-page" id="page-changelog">
+        <div class="page-header">
+          <div>
+            <div class="page-title">📋 Price Change Log</div>
+            <div class="page-subtitle">History of all price changes you've made</div>
+          </div>
+          <button class="btn btn-danger" onclick="clearChangelog()">Clear Log</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-body" style="padding: 0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Type</th>
+                  <th>Old Value</th>
+                  <th>New Value</th>
+                  <th>Changed By</th>
+                </tr>
+              </thead>
+              <tbody id="changelog-body">
+                <tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 40px;">No changes recorded yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg">Saved successfully!</span>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// AUTH — simple localStorage-based session
+// ─────────────────────────────────────────────
+const ADMIN_USER = 'mukesh';
+const ADMIN_PASS = 'autocaptions@admin2026'; // Change this!
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    sessionStorage.setItem('acp_admin_auth', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display  = 'block';
+    initAdmin();
+  } else {
+    const err = document.getElementById('loginError');
+    err.style.display = 'block';
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('acp_admin_auth');
+  location.reload();
+}
+
+// Auto-restore session
+if (sessionStorage.getItem('acp_admin_auth') === '1') {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminPanel').style.display  = 'block';
+}
+
+// ─────────────────────────────────────────────
+// PRICES
+// ─────────────────────────────────────────────
+function getPrices() {
+  try {
+    const s = localStorage.getItem('acp_admin_prices');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return { usd: 49, inr: 999 };
+}
+
+function savePrices() {
+  const inr = parseInt(document.getElementById('input-inr').value, 10);
+  const usd = parseInt(document.getElementById('input-usd').value, 10);
+
+  if (!inr || inr < 1 || !usd || usd < 1) {
+    showToast('❌ Please enter valid prices.', 'error');
+    return;
+  }
+
+  const old = getPrices();
+  const now = new Date().toLocaleString('en-IN');
+
+  // Log changes
+  const log = getChangelog();
+  if (inr !== old.inr) log.unshift({ time: now, type: 'INR', old: `₹${old.inr}`, newVal: `₹${inr}`, by: ADMIN_USER });
+  if (usd !== old.usd) log.unshift({ time: now, type: 'USD', old: `$${old.usd}`, newVal: `$${usd}`, by: ADMIN_USER });
+  localStorage.setItem('acp_admin_changelog', JSON.stringify(log.slice(0, 50)));
+
+  localStorage.setItem('acp_admin_prices', JSON.stringify({ usd, inr, updatedAt: now }));
+  refreshAll();
+  showToast('✅ Prices saved! Changes are live on the Get Pro page.', 'success');
+  document.getElementById('save-status').textContent = 'Last saved: ' + now;
+}
+
+function resetDefaults() {
+  if (!confirm('Reset to default prices (₹999 / $49)?')) return;
+  document.getElementById('input-inr').value = 999;
+  document.getElementById('input-usd').value = 49;
+  savePrices();
+}
+
+function setInrPreset(v) {
+  document.getElementById('input-inr').value = v;
+  updateHints();
+  updateLivePreviews();
+}
+
+function setUsdPreset(v) {
+  document.getElementById('input-usd').value = v;
+  updateLivePreviews();
+}
+
+function updateHints() {
+  const inr = parseInt(document.getElementById('input-inr').value, 10) || 0;
+  document.getElementById('hint-paise').textContent = (inr * 100).toLocaleString('en-IN') + ' paise';
+}
+
+function updateLivePreviews() {
+  const inr = parseInt(document.getElementById('input-inr').value, 10) || 999;
+  const usd = parseInt(document.getElementById('input-usd').value, 10) || 49;
+
+  // Pricing page previews
+  const pv2inr = document.getElementById('pv2-inr');
+  const pv2usd = document.getElementById('pv2-usd');
+  if (pv2inr) pv2inr.textContent = '₹' + inr.toLocaleString('en-IN');
+  if (pv2usd) pv2usd.textContent = '$' + usd;
+}
+
+// ─────────────────────────────────────────────
+// CHANGELOG
+// ─────────────────────────────────────────────
+function getChangelog() {
+  try { return JSON.parse(localStorage.getItem('acp_admin_changelog') || '[]'); } catch(e) { return []; }
+}
+
+function renderChangelog() {
+  const log  = getChangelog();
+  const tbody = document.getElementById('changelog-body');
+  if (!tbody) return;
+
+  if (!log.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 40px;">No changes recorded yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = log.map(r => `
+    <tr>
+      <td style="color:var(--text-muted); font-size:13px;">${r.time}</td>
+      <td><span class="badge ${r.type === 'INR' ? 'badge-inr' : 'badge-usd'}">${r.type}</span></td>
+      <td style="color:var(--text-muted);">${r.old}</td>
+      <td style="font-weight:700; color: var(--success);">${r.newVal}</td>
+      <td style="color:var(--text-muted);">${r.by}</td>
+    </tr>
+  `).join('');
+}
+
+function clearChangelog() {
+  if (!confirm('Clear all change history?')) return;
+  localStorage.removeItem('acp_admin_changelog');
+  renderChangelog();
+  showToast('🗑️ Change log cleared.', 'success');
+}
+
+// ─────────────────────────────────────────────
+// REFRESH ALL
+// ─────────────────────────────────────────────
+function refreshAll() {
+  const p = getPrices();
+
+  // Dashboard stats
+  const dashInr  = document.getElementById('dash-inr');
+  const dashUsd  = document.getElementById('dash-usd');
+  const dashPaise = document.getElementById('dash-paise');
+  const dashUp   = document.getElementById('dash-updated');
+  if (dashInr)   dashInr.textContent   = '₹' + p.inr.toLocaleString('en-IN');
+  if (dashUsd)   dashUsd.textContent   = '$' + p.usd;
+  if (dashPaise) dashPaise.textContent = (p.inr * 100).toLocaleString('en-IN');
+  if (dashUp)    dashUp.textContent    = p.updatedAt || '—';
+
+  // Dashboard previews
+  const prevInr = document.getElementById('prev-inr');
+  const prevUsd = document.getElementById('prev-usd');
+  if (prevInr) prevInr.textContent = '₹' + p.inr.toLocaleString('en-IN');
+  if (prevUsd) prevUsd.textContent = '$' + p.usd;
+
+  // Pricing page inputs
+  const inputInr = document.getElementById('input-inr');
+  const inputUsd = document.getElementById('input-usd');
+  if (inputInr) inputInr.value = p.inr;
+  if (inputUsd) inputUsd.value = p.usd;
+  updateHints();
+  updateLivePreviews();
+
+  // Changelog
+  renderChangelog();
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function showPage(page, btn) {
+  document.querySelectorAll('.section-page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (page === 'changelog') renderChangelog();
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3500);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+function initAdmin() {
+  refreshAll();
+
+  // Live update hints as user types
+  const inputInr = document.getElementById('input-inr');
+  const inputUsd = document.getElementById('input-usd');
+  if (inputInr) inputInr.addEventListener('input', () => { updateHints(); updateLivePreviews(); });
+  if (inputUsd) inputUsd.addEventListener('input', updateLivePreviews);
+}
+
+// If session already active, init immediately
+if (sessionStorage.getItem('acp_admin_auth') === '1') {
+  // Wait for DOM
+  document.addEventListener('DOMContentLoaded', initAdmin);
+  // Also try right away if DOM is already ready
+  if (document.readyState !== 'loading') initAdmin();
+}
+</script>
+</body>
+</html>

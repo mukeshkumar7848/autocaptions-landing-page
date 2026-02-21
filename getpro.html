@@ -75,36 +75,81 @@
 
     .price-highlight {
       background: rgba(255, 255, 255, 0.15);
-      padding: 30px;
-      border-radius: 16px;
+      padding: 30px 30px 24px;
+      border-radius: 20px;
       margin: 40px auto;
-      max-width: 500px;
+      max-width: 520px;
       backdrop-filter: blur(10px);
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.35);
     }
 
     .price-highlight .old-price {
       text-decoration: line-through;
-      opacity: 0.7;
-      font-size: 24px;
-      margin-bottom: 8px;
+      opacity: 0.6;
+      font-size: 22px;
+      margin-bottom: 4px;
     }
 
     .price-highlight .new-price {
-      font-size: 48px;
+      font-size: 58px;
       font-weight: 900;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .price-highlight .price-sub {
+      font-size: 15px;
+      opacity: 0.85;
+      margin-bottom: 14px;
     }
 
     .price-highlight .discount-badge {
       display: inline-block;
       background: #00D2FF;
       color: #0A0A1A;
-      padding: 6px 16px;
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* ── Region Switcher ── */
+    .region-switcher {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin: 18px auto 0;
+      background: rgba(0,0,0,0.25);
+      border-radius: 50px;
+      padding: 4px;
+      max-width: 320px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .region-tab {
+      flex: 1;
+      padding: 10px 18px;
       border-radius: 50px;
       font-size: 14px;
-      font-weight: 700;
-      margin-top: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .region-tab.active {
+      background: white;
+      color: #667eea;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .region-tab:not(.active):hover {
+      color: white;
+      background: rgba(255,255,255,0.12);
     }
 
     .cta-buttons {
@@ -328,26 +373,41 @@
     <div class="getpro-content">
       <div class="getpro-badge">🚀 LIFETIME LICENSE</div>
       <h1>Upgrade to Pro &<br>Unlock Unlimited Power</h1>
-      <p class="subtitle">Join 7,500+ creators who save hours every week with AI-powered captions. Get unlimited generations, batch mode, translation, and lifetime updates.</p>
-      
+      <p class="subtitle">Join 7,500+ creators who save hours every week with AI-powered captions.<br>Get unlimited generations, batch mode, translation, and lifetime updates.</p>
+
+      <!-- Price Card -->
       <div class="price-highlight">
-        <div class="new-price">$49</div>
-        <div style="font-size: 16px; opacity: 0.9; margin-bottom: 12px;">One-time payment • Lifetime access</div>
-        <div class="discount-badge">No Subscription!</div>
+        <!-- Indian price (shown by default when auto-detected) -->
+        <div id="price-india" style="display:none;">
+          <div class="old-price">₹4,999</div>
+          <div class="new-price" id="display-inr">₹<span id="inr-amount">999</span></div>
+          <div class="price-sub">One-time payment • Lifetime access</div>
+          <div class="discount-badge">🇮🇳 Special India Price • No Subscription!</div>
+        </div>
+        <!-- International price -->
+        <div id="price-intl" style="display:block;">
+          <div class="old-price">$99</div>
+          <div class="new-price" id="display-usd">$<span id="usd-amount">49</span></div>
+          <div class="price-sub">One-time payment • Lifetime access</div>
+          <div class="discount-badge">🌍 International Price • No Subscription!</div>
+        </div>
+
+        <!-- Region Switcher -->
+        <div class="region-switcher">
+          <button class="region-tab active" id="tab-intl" onclick="window.manualSwitchRegion('intl')">🌍 International ($)</button>
+          <button class="region-tab" id="tab-india" onclick="window.manualSwitchRegion('india')">🇮🇳 India (₹)</button>
+        </div>
       </div>
 
       <div class="cta-buttons">
         <button id="getProBtn" class="btn-large btn-primary-large">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-          Get Pro Now
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span id="getProBtnText">Get Pro Now</span>
         </button>
         <a href="https://mukeshfx.gumroad.com/l/autocaptions" class="btn-large btn-secondary-large" target="_blank" rel="noopener">
           Try Free Version
         </a>
       </div>
-      <div id="paymentRegionInfo" style="text-align: center; margin-top: 20px; font-size: 14px; opacity: 0.8;"></div>
     </div>
   </section>
 
@@ -562,7 +622,7 @@
       <h2 style="font-size: 42px; font-weight: 800; margin-bottom: 20px;">Ready to Unlock Unlimited Power?</h2>
       <p style="font-size: 20px; margin-bottom: 40px; opacity: 0.95;">Join thousands of creators who trust Auto Captions Pro for their projects</p>
       <button id="finalCtaBtn" class="btn-large btn-primary-large" style="display: inline-flex;">
-        Get Pro for $49 →
+        <span id="finalCtaBtnText">Get Pro for $49 →</span>
       </button>
       <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">One-time payment • Lifetime access • Instant delivery</p>
     </div>
@@ -588,7 +648,8 @@
 
   <!-- Razorpay Checkout Script -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  
+  <!-- Hidden element kept for legacy payment.js compatibility -->
+  <div id="paymentRegionInfo" style="display:none;"></div>
   <script src="script.js"></script>
   <script src="payment.js"></script>
 </body>
